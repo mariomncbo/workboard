@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// One selectable color square of `PaletteColorPicker`. A `nil` fill is the "no color" option.
+/// One selectable square of a color or background picker.
 struct ColorSwatch: View {
-    let fill: Color?
+    let fill: SwatchFill
     let name: LocalizedStringResource
     let isSelected: Bool
     let action: () -> Void
@@ -11,17 +11,7 @@ struct ColorSwatch: View {
 
     var body: some View {
         Button(action: action) {
-            RoundedRectangle(cornerRadius: Radius.xs)
-                .fill(fill ?? .bgComponentActive)
-                .overlay {
-                    if fill == nil {
-                        RoundedRectangle(cornerRadius: Radius.xs)
-                            .strokeBorder(Color.borderHover, lineWidth: 1)
-                        Image(systemName: "line.diagonal")
-                            .font(.caption)
-                            .foregroundStyle(Color.textTertiary)
-                    }
-                }
+            SwatchShape(fill: fill)
                 .frame(width: 24, height: 24)
                 .padding(4)
                 .overlay {

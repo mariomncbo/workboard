@@ -8,9 +8,10 @@ struct WorkBoardApp: App {
         WindowGroup {
             Group {
                 switch setup {
-                case .ready(let auth):
+                case .ready(let auth, let boards):
                     RootView()
                         .environment(auth)
+                        .environment(\.boardRepository, boards)
                 case .misconfigured(let message):
                     ConfigurationErrorView(message: message)
                 }
@@ -20,6 +21,10 @@ struct WorkBoardApp: App {
         }
         .defaultSize(WindowMetrics.defaultSize)
         .windowResizability(.contentMinSize)
+
+        Settings {
+            SettingsView()
+        }
     }
 }
 

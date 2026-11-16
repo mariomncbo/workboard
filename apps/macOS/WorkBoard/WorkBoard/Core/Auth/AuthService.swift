@@ -24,6 +24,11 @@ final class AuthService {
         if case .signedIn(let profile) = state { profile } else { nil }
     }
 
+    /// Email of the signed-in user, shown only to that user (user menu).
+    var currentEmail: String? {
+        client.auth.currentUser?.email
+    }
+
     // MARK: - Session lifecycle
 
     /// Restores the saved session and keeps recent accounts up to date while the app runs.
@@ -155,6 +160,54 @@ final class AuthService {
 
     func cancelAccountSwitch() {
         isSwitchingAccount = false
+    }
+
+    /// From the user menu: opens another recent account, or shows Login when it needs the password.
+    func switchTo(_ account: RecentAccount) async {
+        do {
+            try await continueAs(account)
+        } catch {
+            beginAccountSwitch()
+        }
+    }
+
+    // MARK: - Profile and account
+
+    func updateProfile(fullName: String, nickname: String) async throws(AuthFailure) {
+        guard let current = currentProfile else { throw .sessionExpired }
+        do {
+            let profile: Profile = try await client
+                .from("profiles")
+                .update(["full_name": fullName, "nickname": nickname])
+                .eq("id", value: current.id.uuidString)
+                .select("id, full_name, nickname")
+                .single()
+                .execute()
+                .value
+            recentAccounts.updateProfile(profile)
+            state = .signedIn(profile)
+        } catch let error as PostgrestError where error.code == "23505" {
+            // Unique violation: someone else took the nickname.
+            throw .nicknameTaken
+        } catch {
+            throw AuthFailure(error)
+        }
+    }
+
+    /// Permanently deletes the account and all its data, through the `delete-account`
+    /// Edge Function. The app asks for explicit confirmation first.
+    func deleteAccount() async throws(AuthFailure) {
+        guard let profile = currentProfile else { throw .sessionExpired }
+        do {
+            try await client.functions.invoke("delete-account", options: FunctionInvokeOptions(method: .post))
+        } catch {
+            throw AuthFailure(error)
+        }
+        recentAccounts.remove(profile.id)
+        // The server already revoked the sessions; this clears the local copy.
+        try? await client.auth.signOut(scope: .local)
+        isSwitchingAccount = false
+        state = .signedOut
     }
 
     // MARK: - Sign out

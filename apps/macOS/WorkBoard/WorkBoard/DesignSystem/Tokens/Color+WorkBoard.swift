@@ -21,6 +21,7 @@ private extension Color {
     static let accent5 = Color(hex: 0x173863)
     static let accent11 = Color(hex: 0x92C1FF)
 
+    static let red3 = Color(hex: 0x3A1412)
     static let red9 = Color(hex: 0xC43F3E)
     static let red11 = Color(hex: 0xF8A49D)
 }
@@ -72,6 +73,8 @@ extension Color {
     static let onDanger = Color.white
     /// "Eliminar…" items in menus.
     static let dangerText = red11
+    /// Background of the trash icon in the deletion dialog.
+    static let dangerSubtle = red3
 
     /// Filled star of a favorite board.
     static let favorite = Color(hex: 0xE4B750)

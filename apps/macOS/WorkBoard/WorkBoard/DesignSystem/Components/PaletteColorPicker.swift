@@ -10,12 +10,12 @@ struct PaletteColorPicker: View {
         VStack(alignment: .leading, spacing: Spacing.s1) {
             HStack(spacing: 2) {
                 if allowsNoColor {
-                    ColorSwatch(fill: nil, name: "Sin color", isSelected: selection == nil) {
+                    ColorSwatch(fill: .none, name: "Sin color", isSelected: selection == nil) {
                         selection = nil
                     }
                 }
                 ForEach(PaletteColor.allCases) { color in
-                    ColorSwatch(fill: color.color, name: color.name, isSelected: selection == color) {
+                    ColorSwatch(fill: .color(color.color), name: color.name, isSelected: selection == color) {
                         selection = color
                     }
                 }

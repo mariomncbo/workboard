@@ -4,6 +4,7 @@ import SwiftUI
 /// restores the session at launch and handles links that open the app.
 struct RootView: View {
     @Environment(AuthService.self) private var auth
+    @Environment(\.boardRepository) private var boardRepository
 
     var body: some View {
         // A ZStack (not a Group) so `task` runs once for the window, not once per screen.
@@ -18,8 +19,10 @@ struct RootView: View {
             case .signedIn(let profile):
                 if auth.isSwitchingAccount {
                     AuthFlowView()
-                } else {
-                    HomePlaceholderView(profile: profile)
+                } else if let boardRepository {
+                    // A new identity per account resets Home when switching accounts.
+                    HomeView(profile: profile, repository: boardRepository)
+                        .id(profile.id)
                 }
             case .choosingNewPassword:
                 NewPasswordView()

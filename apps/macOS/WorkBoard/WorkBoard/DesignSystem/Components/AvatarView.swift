@@ -4,13 +4,16 @@ import SwiftUI
 /// Neutral on purpose, so it never competes with the primary action.
 struct AvatarView: View {
     enum Size {
-        /// 28 pt, inside the glass account button of the toolbar.
+        /// 22 pt, in the account rows of the user menu.
+        case mini
+        /// 28 pt, inside the glass account button of the toolbar and on Login.
         case small
-        /// 44 pt, in the user menu and the recent accounts of Login.
+        /// 44 pt, in the user menu header and on Register.
         case large
 
         fileprivate var diameter: Double {
             switch self {
+            case .mini: 22
             case .small: 28
             case .large: 44
             }
@@ -18,6 +21,7 @@ struct AvatarView: View {
 
         fileprivate var fontSize: Double {
             switch self {
+            case .mini: 9
             case .small: 11
             case .large: 15
             }

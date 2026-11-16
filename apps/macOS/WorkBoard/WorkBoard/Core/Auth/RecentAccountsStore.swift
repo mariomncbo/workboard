@@ -40,6 +40,14 @@ final class RecentAccountsStore {
         save()
     }
 
+    /// Updates the name and nickname shown for an account after editing the profile.
+    func updateProfile(_ profile: Profile) {
+        guard let index = accounts.firstIndex(where: { $0.id == profile.id }) else { return }
+        accounts[index].fullName = profile.fullName
+        accounts[index].nickname = profile.nickname
+        save()
+    }
+
     /// Keeps the account in the list, but it will ask for the password next time.
     func forgetSession(for id: UUID) {
         guard let index = accounts.firstIndex(where: { $0.id == id }) else { return }
