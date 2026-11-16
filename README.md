@@ -8,11 +8,12 @@ Disponible como app nativa para **macOS**, con versión **web** en camino.
 
 ## Características
 
-- **Cuentas de usuario**: registro e inicio de sesión con nickname y contraseña.
+- **Cuentas de usuario**: registro con correo y contraseña, e inicio de sesión con correo o nickname.
 - **Sesión persistente**: la sesión sigue abierta entre aperturas de la app.
 - **Multicuenta**: cambia entre las últimas cuentas usadas en el dispositivo sin volver a escribir la contraseña.
 - **Tableros**: cada uno con su fondo de color. Márcalos como favoritos ⭐ para que aparezcan primero.
 - **Listas y tareas**: listas en horizontal y tareas con nombre, descripción y color.
+- **Borrado seguro**: cualquier eliminación definitiva pide confirmación antes de ejecutarse.
 - **Búsqueda**: encuentra cualquier tablero al instante.
 - **Próximamente**: Notas y Planificador integrados en cada tablero.
 
