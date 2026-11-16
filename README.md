@@ -58,15 +58,43 @@ workboard/
 
 - macOS 27.2 o superior
 - Xcode 27 o superior
-- Un proyecto de [Supabase](https://supabase.com)
-- [Supabase CLI](https://supabase.com/docs/guides/cli)
+- Una cuenta de [Supabase](https://supabase.com) (el plan Free es suficiente)
+- [Supabase CLI](https://supabase.com/docs/guides/cli) 3.x: `brew install supabase`
 
-### Puesta en marcha
+No hace falta Docker: el backend se despliega directamente en un proyecto de Supabase en la nube.
 
-> Las instrucciones detalladas se ampliarán a medida que avance el proyecto.
+### 1. Backend (Supabase)
 
-1. Clona el repositorio.
-2. Crea un proyecto en Supabase y aplica las migraciones de `supabase/`.
-3. Configura las claves de Supabase de la app macOS a partir del archivo de ejemplo. Los archivos con claves reales no se suben al repositorio.
-4. Abre `apps/macOS/WorkBoard/WorkBoard.xcodeproj` en Xcode y selecciona tu equipo en *Signing & Capabilities*.
-5. Compila y ejecuta (⌘R).
+1. Crea un proyecto en el [dashboard de Supabase](https://supabase.com/dashboard).
+2. En **Authentication → Sign In / Providers**:
+   - Desactiva **Confirm email**.
+   - En **Email**, pon **Minimum password length** en 8.
+3. Desde la raíz del repositorio, enlaza la CLI con tu proyecto. Hazlo en una terminal interactiva, porque `supabase link` pide la contraseña de la base de datos:
+
+   ```sh
+   supabase login
+   supabase link <project-ref>
+   ```
+
+4. Aplica las migraciones y despliega las Edge Functions:
+
+   ```sh
+   supabase db push --remote
+   supabase functions deploy --use-api --remote
+   ```
+
+| Pieza | Qué contiene |
+| --- | --- |
+| `supabase/migrations/` | Esquema (perfiles, tableros, listas y tareas), Row Level Security y funciones de registro |
+| `supabase/functions/sign-in` | Inicio de sesión con correo o nickname; el correo de un nickname se resuelve en el servidor |
+| `supabase/functions/delete-account` | Elimina la cuenta del usuario y todos sus datos |
+
+### 2. App macOS
+
+1. Copia `apps/macOS/WorkBoard/Secrets.example.plist` a `apps/macOS/WorkBoard/WorkBoard/Config/Secrets.plist` y rellena:
+   - `SupabaseURL`: la URL de tu proyecto (`https://<project-ref>.supabase.co`).
+   - `SupabasePublishableKey`: la *publishable key* (`sb_publishable_…`) de **Project Settings → API Keys**.
+
+   `Secrets.plist` no se sube al repositorio. Nunca uses la *secret key* en la app.
+2. Abre `apps/macOS/WorkBoard/WorkBoard.xcodeproj` en Xcode y selecciona tu equipo en *Signing & Capabilities*.
+3. Compila y ejecuta (⌘R). Xcode descarga automáticamente las dependencias (Swift Package Manager).
