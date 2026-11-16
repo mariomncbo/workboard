@@ -2,11 +2,21 @@ import SwiftUI
 
 @main
 struct WorkBoardApp: App {
+    @State private var setup = AppSetup.make()
+
     var body: some Scene {
         WindowGroup {
-            RootView()
-                .frame(minWidth: WindowMetrics.minSize.width, minHeight: WindowMetrics.minSize.height)
-                .preferredColorScheme(.dark)
+            Group {
+                switch setup {
+                case .ready(let auth):
+                    RootView()
+                        .environment(auth)
+                case .misconfigured(let message):
+                    ConfigurationErrorView(message: message)
+                }
+            }
+            .frame(minWidth: WindowMetrics.minSize.width, minHeight: WindowMetrics.minSize.height)
+            .preferredColorScheme(.dark)
         }
         .defaultSize(WindowMetrics.defaultSize)
         .windowResizability(.contentMinSize)
