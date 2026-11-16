@@ -1,6 +1,13 @@
-# WorkBoard
-
-**WorkBoard** es una aplicación de gestión de proyectos basada en tableros. Organiza tu trabajo en **tableros**, **listas** y **tareas**, y ten todo a la vista en un espacio de trabajo limpio y visual.
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="brand/logo/workboard-simbolo-oscuro.svg" />
+    <img src="brand/logo/workboard-simbolo-claro.svg" alt="WorkBoard" width="120" />
+  </picture>
+  <h1>WorkBoard</h1>
+</div>
+<div align="center">
+  <p><b>WorkBoard</b> es una aplicación de gestión de proyectos basada en tableros. Organiza tu trabajo en <b>tableros</b>, <b>listas</b> y <b>tareas</b>, y ten todo a la vista en un espacio de trabajo limpio y visual.</p>
+</div>
 
 Disponible como app nativa para **macOS**, con versión **web** en camino.
 
@@ -11,7 +18,7 @@ Disponible como app nativa para **macOS**, con versión **web** en camino.
 - **Cuentas de usuario**: registro con correo y contraseña, e inicio de sesión con correo o nickname.
 - **Sesión persistente**: la sesión sigue abierta entre aperturas de la app.
 - **Multicuenta**: cambia entre las últimas cuentas usadas en el dispositivo sin volver a escribir la contraseña.
-- **Tableros**: cada uno con su fondo de color. Márcalos como favoritos ⭐ para que aparezcan primero.
+- **Tableros**: cada uno con su descripción y su fondo, de color o con una cuadrícula de puntos animada. Márcalos como favoritos ⭐ para que aparezcan primero.
 - **Listas y tareas**: listas en horizontal y tareas con nombre, descripción y color.
 - **Borrado seguro**: cualquier eliminación definitiva pide confirmación antes de ejecutarse.
 - **Búsqueda**: encuentra cualquier tablero al instante.
@@ -41,6 +48,7 @@ workboard/
 ├── apps/
 │   ├── macOS/      # App nativa (Xcode · SwiftUI)
 │   └── web/        # App web
+├── brand/logo/     # Logo y sus variantes
 └── supabase/       # Esquema de base de datos y migraciones SQL
 ```
 
