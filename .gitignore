@@ -1,0 +1,88 @@
+# ─────────────────────────────────────────────
+# Sistema operativo
+# ─────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+
+# ─────────────────────────────────────────────
+# Editores / IDEs
+# ─────────────────────────────────────────────
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+*~
+
+# ─────────────────────────────────────────────
+# Secretos y configuración local
+# ─────────────────────────────────────────────
+# Claves de Supabase de la app macOS (se versiona Secrets.example.plist)
+Secrets.plist
+*.local.xcconfig
+# Variables de entorno (web / Supabase CLI)
+.env
+.env.*
+!.env.example
+
+# ─────────────────────────────────────────────
+# Xcode / Swift (apps/macOS)
+# ─────────────────────────────────────────────
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+DerivedData/
+build/
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM
+*.dSYM.zip
+timeline.xctimeline
+playground.xcworkspace
+
+# Swift Package Manager
+.build/
+.swiftpm/
+!**/xcshareddata/swiftpm/
+Packages/
+
+# ─────────────────────────────────────────────
+# Web (apps/web)
+# ─────────────────────────────────────────────
+node_modules/
+.pnpm-store/
+dist/
+.next/
+.nuxt/
+.output/
+.svelte-kit/
+.vercel/
+.turbo/
+.cache/
+coverage/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ─────────────────────────────────────────────
+# Supabase CLI
+# ─────────────────────────────────────────────
+supabase/.temp/
+supabase/.branches/
+
+# ─────────────────────────────────────────────
+# Claude Code (instrucciones locales, no se publican)
+# ─────────────────────────────────────────────
+CLAUDE.md
+.claude/
+.agents/
+skills-lock.json
