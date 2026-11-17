@@ -2,8 +2,12 @@ import SwiftUI
 
 /// The only way to create a task: "Añade una tarea" at the bottom of a list turns into a
 /// field with "Añadir" and ✕. After adding, the field stays open for the next task.
+/// The button only shows while the pointer is over its list; it keeps its space so the
+/// list does not change height.
 struct AddTaskField: View {
     let style: BoardListStyle
+    /// Whether the pointer is over the list.
+    let isListHovered: Bool
     let onAdd: (String) async throws(DataFailure) -> Void
 
     @State private var isEditing = false
@@ -85,6 +89,9 @@ struct AddTaskField: View {
             }
             .buttonStyle(.plain)
             .onHover { isHovered = $0 }
+            .opacity(isListHovered ? 1 : 0)
+            .allowsHitTesting(isListHovered)
+            .animation(.easeOut(duration: 0.15), value: isListHovered)
         }
     }
 

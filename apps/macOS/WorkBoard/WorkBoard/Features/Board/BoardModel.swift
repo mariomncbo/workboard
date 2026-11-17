@@ -87,23 +87,26 @@ final class BoardModel {
         }
     }
 
-    /// Applies a drag reorder of lists right away, then saves the moved lists' positions.
-    func reorderLists(_ difference: ReorderDifference<UUID, ReorderableSingleCollectionIdentifier>) {
-        difference.apply(to: &lists)
+    /// Moves a dragged list to the place of the list it was dropped on: after it when coming
+    /// from the left, before it when coming from the right. Saves only the moved list.
+    func moveList(_ listID: UUID, onto targetID: UUID) {
+        guard listID != targetID,
+              let sourceIndex = lists.firstIndex(where: { $0.id == listID }),
+              let targetIndex = lists.firstIndex(where: { $0.id == targetID }) else { return }
 
-        var changes: [(id: UUID, position: Double)] = []
-        for movedID in difference.sources {
-            guard let index = lists.firstIndex(where: { $0.id == movedID }) else { continue }
-            let previous = index > 0 ? lists[index - 1].position : nil
-            let next = index < lists.count - 1 ? lists[index + 1].position : nil
-            lists[index].position = FractionalPosition.between(previous, and: next)
-            changes.append((movedID, lists[index].position))
-        }
+        var moved = lists.remove(at: sourceIndex)
+        // After removing the source, inserting at the target's old index lands right after the
+        // target when moving right, and right before it when moving left.
+        lists.insert(moved, at: targetIndex)
 
+        let previous = targetIndex > 0 ? lists[targetIndex - 1].position : nil
+        let next = targetIndex < lists.count - 1 ? lists[targetIndex + 1].position : nil
+        moved.position = FractionalPosition.between(previous, and: next)
+        lists[targetIndex] = moved
+
+        let position = moved.position
         persist { [listRepository] () throws(DataFailure) in
-            for change in changes {
-                try await listRepository.setPosition(change.position, of: change.id)
-            }
+            try await listRepository.setPosition(position, of: listID)
         }
     }
 
@@ -148,41 +151,33 @@ final class BoardModel {
         }
     }
 
-    /// Applies a drag of tasks, within a list or to another one, then saves each moved task.
-    func moveTasks(_ difference: ReorderDifference<UUID, UUID>) {
-        let destinationListID = difference.destination.collectionID
-        let allTasks = tasksByList.values.flatMap { $0 }
-        let moved = difference.sources.compactMap { id in allTasks.first { $0.id == id } }
-        guard !moved.isEmpty else { return }
+    /// Moves a dropped task right away, then saves its new list and position.
+    /// - Parameters:
+    ///   - taskID: The dragged task.
+    ///   - listID: The list it was dropped on.
+    ///   - followingID: The task it was dropped on, to go just before it; `nil` puts it at the end.
+    func moveTask(_ taskID: UUID, toList listID: UUID, before followingID: UUID?) {
+        guard taskID != followingID,
+              list(withID: listID) != nil,
+              let task = tasksByList.values.lazy.flatMap({ $0 }).first(where: { $0.id == taskID }) else { return }
 
-        let movedIDs = Set(difference.sources)
-        for listID in tasksByList.keys {
-            tasksByList[listID]?.removeAll { movedIDs.contains($0.id) }
-        }
+        tasksByList[task.listID]?.removeAll { $0.id == taskID }
 
-        var destination = tasksByList[destinationListID] ?? []
-        let insertionIndex: Int = switch difference.destination.position {
-        case .before(let followingID): destination.firstIndex { $0.id == followingID } ?? destination.endIndex
-        case .end: destination.endIndex
-        }
-        destination.insert(contentsOf: moved, at: insertionIndex)
+        var destination = tasksByList[listID] ?? []
+        let index = followingID.flatMap { id in destination.firstIndex { $0.id == id } } ?? destination.endIndex
+        let previous = index > 0 ? destination[index - 1].position : nil
+        let next = index < destination.count ? destination[index].position : nil
 
-        var placements: [(id: UUID, placement: TaskPlacement)] = []
-        for offset in moved.indices {
-            let index = insertionIndex + offset
-            let previous = index > 0 ? destination[index - 1].position : nil
-            let next = index < destination.count - 1 ? destination[index + 1].position : nil
-            destination[index].listID = destinationListID
-            destination[index].position = FractionalPosition.between(previous, and: next)
-            placements.append((destination[index].id, TaskPlacement(listID: destinationListID, position: destination[index].position)))
-        }
-        tasksByList[destinationListID] = destination
+        var moved = task
+        moved.listID = listID
+        moved.position = FractionalPosition.between(previous, and: next)
+        destination.insert(moved, at: index)
+        tasksByList[listID] = destination
         syncTaskCounts()
 
+        let placement = TaskPlacement(listID: listID, position: moved.position)
         persist { [taskRepository] () throws(DataFailure) in
-            for change in placements {
-                try await taskRepository.move(change.id, to: change.placement)
-            }
+            try await taskRepository.move(taskID, to: placement)
         }
     }
 

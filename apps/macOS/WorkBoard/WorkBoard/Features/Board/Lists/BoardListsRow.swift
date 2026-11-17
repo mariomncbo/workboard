@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// The board's lists side by side, scrolling horizontally. Lists are reordered by dragging,
-/// and tasks can be dragged within a list or to another list.
+/// The board's lists side by side, scrolling horizontally. Lists and tasks are dragged and
+/// dropped: a list onto another list, a task within its list or to another one.
 struct BoardListsRow: View {
     let model: BoardModel
     let onRename: (BoardList, String) -> Void
@@ -24,18 +24,21 @@ struct BoardListsRow: View {
                         onAddTask: { name throws(DataFailure) in try await model.addTask(named: name, to: list) },
                         onOpenTask: onOpenTask,
                         onSetTaskColor: onSetTaskColor,
-                        onDeleteTask: onDeleteTask
+                        onDeleteTask: onDeleteTask,
+                        onMoveTask: { taskID, followingID in
+                            model.moveTask(taskID, toList: list.id, before: followingID)
+                        },
+                        onMoveList: { listID in
+                            model.moveList(listID, onto: list.id)
+                        }
                     )
                 }
-                .reorderable()
             }
-            .reorderContainer(for: BoardTask.self, in: UUID.self, move: model.moveTasks)
             .padding(.horizontal, Spacing.s5)
             .padding(.top, 16)
             // Room for the floating bar.
             .padding(.bottom, 100)
             .frame(maxHeight: .infinity, alignment: .top)
         }
-        .reorderContainer(for: BoardList.self, move: model.reorderLists)
     }
 }
