@@ -3,16 +3,13 @@ import SwiftUI
 /// Home: "Mi espacio de trabajo" with the user's boards, favorites first.
 struct HomeView: View {
     let profile: Profile
+    @Bindable var model: HomeModel
+    let onOpenBoard: (Board) -> Void
+    let onShowProfile: () -> Void
+    let onDeleteAccount: () -> Void
 
-    @Environment(AuthService.self) private var auth
-    @State private var model: HomeModel
     @State private var activeModal: HomeModal?
     @State private var deletion: DeletionRequest?
-
-    init(profile: Profile, repository: BoardRepository) {
-        self.profile = profile
-        _model = State(initialValue: HomeModel(repository: repository))
-    }
 
     var body: some View {
         ScrollView {
@@ -51,7 +48,7 @@ struct HomeView: View {
                     BoardGrid(
                         boards: model.visibleBoards,
                         summary: model.summary(for:),
-                        onOpen: open,
+                        onOpen: onOpenBoard,
                         onToggleFavorite: toggleFavorite,
                         onShowSettings: showSettings,
                         onDelete: confirmDeletion,
@@ -68,8 +65,8 @@ struct HomeView: View {
             HomeToolbar(
                 profile: profile,
                 onCreateBoard: showCreateBoard,
-                onShowProfile: showProfile,
-                onDeleteAccount: confirmAccountDeletion
+                onShowProfile: onShowProfile,
+                onDeleteAccount: onDeleteAccount
             )
         }
         .toolbar(removing: .title)
@@ -85,8 +82,6 @@ struct HomeView: View {
                     onDelete: { confirmDeletion(of: board) },
                     onClose: closeModal
                 )
-            case .profile:
-                ProfileModal(profile: profile, onClose: closeModal)
             }
         }
         .deletionConfirmation($deletion)
@@ -103,12 +98,6 @@ struct HomeView: View {
         }
     }
 
-    /// Opens the board screen.
-    private func open(_ board: Board) {
-        // The board screen is the next step of the app; until then, opening shows its settings.
-        showSettings(board)
-    }
-
     private func toggleFavorite(_ board: Board) {
         Task {
             await model.toggleFavorite(board)
@@ -121,10 +110,6 @@ struct HomeView: View {
 
     private func showSettings(_ board: Board) {
         activeModal = .boardSettings(board)
-    }
-
-    private func showProfile() {
-        activeModal = .profile
     }
 
     private func closeModal() {
@@ -144,17 +129,6 @@ struct HomeView: View {
         ) {
             try await model.delete(board)
             activeModal = nil
-        }
-    }
-
-    private func confirmAccountDeletion() {
-        deletion = DeletionRequest(
-            title: "¿Eliminar tu cuenta?",
-            message: "Se borrarán tu perfil, tus tableros, sus listas y sus tareas. Esta acción no se puede deshacer.",
-            actionTitle: "Eliminar cuenta",
-            confirmationPhrase: profile.nickname
-        ) {
-            try await auth.deleteAccount()
         }
     }
 }

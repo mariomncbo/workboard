@@ -4,13 +4,11 @@ import Foundation
 enum HomeModal: Identifiable {
     case createBoard
     case boardSettings(Board)
-    case profile
 
     var id: String {
         switch self {
         case .createBoard: "create-board"
         case .boardSettings(let board): "board-settings-\(board.id)"
-        case .profile: "profile"
         }
     }
 }

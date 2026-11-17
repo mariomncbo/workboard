@@ -8,10 +8,11 @@ struct WorkBoardApp: App {
         WindowGroup {
             Group {
                 switch setup {
-                case .ready(let auth, let boards):
+                case .ready(let auth, let boards, let lists):
                     RootView()
                         .environment(auth)
                         .environment(\.boardRepository, boards)
+                        .environment(\.listRepository, lists)
                 case .misconfigured(let message):
                     ConfigurationErrorView(message: message)
                 }
