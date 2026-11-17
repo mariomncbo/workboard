@@ -6,6 +6,7 @@ struct WorkspaceView: View {
     let profile: Profile
     let boardRepository: BoardRepository
     let listRepository: ListRepository
+    let taskRepository: TaskRepository
 
     @Environment(AuthService.self) private var auth
     /// Kept while a board is open, so Home shows its boards right away when coming back.
@@ -14,10 +15,16 @@ struct WorkspaceView: View {
     @State private var accountModal: AccountModal?
     @State private var accountDeletion: DeletionRequest?
 
-    init(profile: Profile, boardRepository: BoardRepository, listRepository: ListRepository) {
+    init(
+        profile: Profile,
+        boardRepository: BoardRepository,
+        listRepository: ListRepository,
+        taskRepository: TaskRepository
+    ) {
         self.profile = profile
         self.boardRepository = boardRepository
         self.listRepository = listRepository
+        self.taskRepository = taskRepository
         _homeModel = State(initialValue: HomeModel(repository: boardRepository))
     }
 
@@ -29,6 +36,7 @@ struct WorkspaceView: View {
                     profile: profile,
                     boardRepository: boardRepository,
                     listRepository: listRepository,
+                    taskRepository: taskRepository,
                     onGoHome: goHome,
                     onShowProfile: showProfile,
                     onDeleteAccount: confirmAccountDeletion

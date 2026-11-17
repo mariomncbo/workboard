@@ -1,7 +1,16 @@
+import Foundation
+
 /// Modals that can be open on a board.
-enum BoardModal: String, Identifiable {
+enum BoardModal: Identifiable {
     case settings
     case createList
+    case task(BoardTask)
 
-    var id: Self { self }
+    var id: String {
+        switch self {
+        case .settings: "settings"
+        case .createList: "create-list"
+        case .task(let task): "task-\(task.id)"
+        }
+    }
 }

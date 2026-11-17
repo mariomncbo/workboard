@@ -4,7 +4,7 @@ import Supabase
 /// Builds the app's services at launch. If `Secrets.plist` is missing or invalid,
 /// the app shows what to fix instead of crashing.
 enum AppSetup {
-    case ready(auth: AuthService, boards: BoardRepository, lists: ListRepository)
+    case ready(auth: AuthService, boards: BoardRepository, lists: ListRepository, tasks: TaskRepository)
     case misconfigured(message: String)
 
     static func make() -> AppSetup {
@@ -14,7 +14,8 @@ enum AppSetup {
             return .ready(
                 auth: AuthService(client: client),
                 boards: BoardRepository(client: client),
-                lists: ListRepository(client: client)
+                lists: ListRepository(client: client),
+                tasks: TaskRepository(client: client)
             )
         } catch {
             return .misconfigured(message: error.localizedDescription)

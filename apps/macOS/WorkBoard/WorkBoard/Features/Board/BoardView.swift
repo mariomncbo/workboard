@@ -17,6 +17,7 @@ struct BoardView: View {
         profile: Profile,
         boardRepository: BoardRepository,
         listRepository: ListRepository,
+        taskRepository: TaskRepository,
         onGoHome: @escaping () -> Void,
         onShowProfile: @escaping () -> Void,
         onDeleteAccount: @escaping () -> Void
@@ -25,7 +26,12 @@ struct BoardView: View {
         self.onGoHome = onGoHome
         self.onShowProfile = onShowProfile
         self.onDeleteAccount = onDeleteAccount
-        _model = State(initialValue: BoardModel(board: board, boardRepository: boardRepository, listRepository: listRepository))
+        _model = State(initialValue: BoardModel(
+            board: board,
+            boardRepository: boardRepository,
+            listRepository: listRepository,
+            taskRepository: taskRepository
+        ))
     }
 
     var body: some View {
@@ -46,11 +52,13 @@ struct BoardView: View {
                 EmptyBoardView(isOnColor: model.board.background != .dots, onAddList: showCreateList)
             } else {
                 BoardListsRow(
-                    lists: model.lists,
-                    onReorder: model.reorder,
+                    model: model,
                     onRename: rename,
                     onSetStyle: setStyle,
-                    onDelete: confirmDeletion
+                    onDelete: confirmDeletion,
+                    onOpenTask: openTask,
+                    onSetTaskColor: setColor,
+                    onDeleteTask: confirmTaskDeletion
                 )
             }
         }
@@ -94,6 +102,14 @@ struct BoardView: View {
                 )
             case .createList:
                 CreateListModal(onCreate: model.createList, onClose: closeModal)
+            case .task(let task):
+                TaskModal(
+                    task: task,
+                    listName: model.list(withID: task.listID)?.name ?? "",
+                    onSave: { draft throws(DataFailure) in try await model.updateTask(task, with: draft) },
+                    onDelete: { confirmTaskDeletion(task) },
+                    onClose: closeModal
+                )
             }
         }
         .deletionConfirmation($deletion)
@@ -128,6 +144,16 @@ struct BoardView: View {
         }
     }
 
+    private func openTask(_ task: BoardTask) {
+        activeModal = .task(task)
+    }
+
+    private func setColor(_ task: BoardTask, _ color: PaletteColor?) {
+        Task {
+            await model.setColor(color, of: task)
+        }
+    }
+
     private func showSettings() {
         activeModal = .settings
     }
@@ -151,6 +177,17 @@ struct BoardView: View {
             actionTitle: "Eliminar lista"
         ) {
             try await model.delete(list)
+        }
+    }
+
+    private func confirmTaskDeletion(_ task: BoardTask) {
+        deletion = DeletionRequest(
+            title: "¿Eliminar la tarea «\(task.name)»?",
+            message: "Esta acción no se puede deshacer.",
+            actionTitle: "Eliminar tarea"
+        ) {
+            try await model.deleteTask(task)
+            activeModal = nil
         }
     }
 

@@ -6,6 +6,7 @@ struct RootView: View {
     @Environment(AuthService.self) private var auth
     @Environment(\.boardRepository) private var boardRepository
     @Environment(\.listRepository) private var listRepository
+    @Environment(\.taskRepository) private var taskRepository
 
     var body: some View {
         // A ZStack (not a Group) so `task` runs once for the window, not once per screen.
@@ -20,10 +21,15 @@ struct RootView: View {
             case .signedIn(let profile):
                 if auth.isSwitchingAccount {
                     AuthFlowView()
-                } else if let boardRepository, let listRepository {
+                } else if let boardRepository, let listRepository, let taskRepository {
                     // A new identity per account resets the workspace when switching accounts.
-                    WorkspaceView(profile: profile, boardRepository: boardRepository, listRepository: listRepository)
-                        .id(profile.id)
+                    WorkspaceView(
+                        profile: profile,
+                        boardRepository: boardRepository,
+                        listRepository: listRepository,
+                        taskRepository: taskRepository
+                    )
+                    .id(profile.id)
                 }
             case .choosingNewPassword:
                 NewPasswordView()
