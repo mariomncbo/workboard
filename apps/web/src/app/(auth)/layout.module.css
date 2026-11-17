@@ -4,7 +4,37 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--space-5);
-  padding: var(--space-10) var(--space-5);
-  text-align: center;
+  padding: var(--space-10) var(--space-5) 72px;
+}
+
+.footer {
+  position: fixed;
+  right: var(--space-5);
+  bottom: 16px;
+  display: flex;
+  gap: 16px;
+}
+
+.footerLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: var(--text-callout);
+  color: var(--text-secondary);
+}
+
+.footerLink:hover {
+  color: var(--text-primary);
+}
+
+@media (max-width: 600px) {
+  .footer {
+    position: static;
+    justify-content: center;
+    padding-bottom: var(--space-5);
+  }
+
+  .page {
+    padding-bottom: var(--space-5);
+  }
 }

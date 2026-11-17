@@ -1,0 +1,11 @@
+.textarea {
+  height: auto;
+  min-height: 72px;
+  padding: 6px 10px;
+  resize: vertical;
+}
+
+.note {
+  font-weight: 400;
+  color: var(--text-tertiary);
+}

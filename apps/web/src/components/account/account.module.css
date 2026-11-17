@@ -1,0 +1,38 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.avatarRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.avatarHelp {
+  margin: 0;
+  font: var(--text-subheadline);
+  color: var(--text-tertiary);
+}
+
+.comingSoon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: var(--space-5) 0;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.comingSoonTitle {
+  margin: 4px 0 0;
+  font: var(--text-title3);
+  color: var(--text-primary);
+}
+
+.comingSoonText {
+  margin: 0;
+  font: var(--text-callout);
+}

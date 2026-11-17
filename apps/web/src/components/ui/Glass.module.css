@@ -1,0 +1,145 @@
+/* Glass surface (design system: glass-fill + blur + stroke + edge + shadow-glass). */
+.surface,
+.standalone.glass {
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 var(--glass-stroke),
+    inset 0 0 0 1px var(--glass-stroke),
+    0 0 0 0.5px var(--glass-edge),
+    var(--shadow-glass);
+  color: var(--text-primary);
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--radius-full);
+  font: 500 13px/16px var(--font-sans);
+  color: var(--text-primary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color 0.15s ease,
+    transform 0.12s ease;
+}
+
+.button:active {
+  transform: scale(0.96);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.standalone.glass:not(:disabled):hover {
+  background: var(--glass-fill-hover);
+}
+
+/* A glass button whose menu is open: tinted with the accent. */
+.standalone.glass[aria-expanded="true"],
+.standalone.glass[aria-expanded="true"]:hover {
+  background: var(--glass-tint);
+  color: var(--accent-text);
+}
+
+.prominent {
+  background: var(--accent-solid);
+  color: var(--on-accent);
+  box-shadow:
+    inset 0 1px 0 var(--glass-stroke),
+    var(--shadow-glass);
+}
+
+.prominent:not(:disabled):hover {
+  background: var(--accent-solid-hover);
+}
+
+.circle {
+  width: 28px;
+  padding: 0;
+  font: 600 11px/1 var(--font-sans);
+}
+
+/* Group (floating bar) */
+.group {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--radius-full);
+}
+
+.inGroup {
+  background: transparent;
+}
+
+.inGroup:not(:disabled):hover {
+  background: var(--glass-fill-hover);
+}
+
+.active,
+.active:not(:disabled):hover {
+  background: var(--glass-tint);
+  color: var(--accent-text);
+}
+
+.separator {
+  width: 1px;
+  height: 16px;
+  margin: 0 2px;
+  background: var(--glass-stroke);
+}
+
+/* "Reduce transparency": solid surface instead of glass. */
+@media (prefers-reduced-transparency: reduce) {
+  .surface,
+  .standalone.glass {
+    background: var(--bg-component);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+.search {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: 260px;
+  max-width: 100%;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: var(--radius-full);
+  color: var(--text-tertiary);
+  cursor: text;
+}
+
+.search:focus-within {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  font: var(--text-body);
+  outline: none;
+}
+
+.searchInput::placeholder {
+  color: var(--text-tertiary);
+}
+
+.searchInput::-webkit-search-cancel-button {
+  filter: grayscale(1);
+}

@@ -1,0 +1,17 @@
+.message {
+  margin: 0;
+  font: var(--text-subheadline);
+  color: var(--text-tertiary);
+  text-align: left;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--danger-text);
+}
+
+.error svg {
+  flex-shrink: 0;
+}

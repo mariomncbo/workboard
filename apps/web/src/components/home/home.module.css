@@ -1,0 +1,363 @@
+/* ─── Page ─────────────────────────────────────────── */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-7) var(--space-10) var(--space-10);
+}
+
+.titleRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.title {
+  margin: 0;
+  font: var(--text-largeTitle);
+  letter-spacing: -0.02em;
+}
+
+.titleMeta {
+  margin: 0;
+  font: var(--text-callout);
+  color: var(--text-secondary);
+}
+
+.search {
+  width: 260px;
+}
+
+.grid {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-5);
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 80px 0;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.emptyTitle {
+  margin: 6px 0 0;
+  font: var(--text-title3);
+  color: var(--text-primary);
+}
+
+.emptyText {
+  margin: 0 0 var(--space-3);
+  font: var(--text-callout);
+}
+
+.banner {
+  position: fixed;
+  left: 50%;
+  bottom: var(--space-5);
+  transform: translateX(-50%);
+  z-index: 20;
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: var(--space-5) var(--space-3) var(--space-10);
+  }
+
+  .search {
+    flex: 1;
+    width: auto;
+    min-width: 0;
+  }
+
+  /* "Crear" keeps only its icon; the label stays for screen readers. */
+  .createLabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* ─── Board card ───────────────────────────────────── */
+
+.card {
+  position: relative;
+  border-radius: var(--radius-sm);
+  background: var(--bg-component);
+  box-shadow: inset 0 0 0 1px var(--border-subtle);
+  overflow: hidden;
+  transition: box-shadow 0.15s ease;
+}
+
+.card:hover {
+  box-shadow: inset 0 0 0 1px var(--border-hover);
+}
+
+.cardLink {
+  display: flex;
+  flex-direction: column;
+  color: inherit;
+  border-radius: inherit;
+}
+
+.cardLink:hover {
+  text-decoration: none;
+}
+
+.cardLink:focus-visible {
+  outline-offset: -2px;
+}
+
+.cover {
+  flex-shrink: 0;
+  background: var(--bg-component-active);
+}
+
+.coverDots {
+  background-image: radial-gradient(circle at center, var(--backdrop-dot) 1px, transparent 1.5px);
+  background-size: 12px 12px;
+  background-position: 6px 6px;
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px 12px;
+  min-width: 0;
+}
+
+.cardName {
+  font: var(--text-headline);
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cardMeta {
+  font: var(--text-subheadline);
+  color: var(--text-secondary);
+}
+
+.cardAction {
+  position: absolute;
+  top: 6px;
+  color: var(--on-palette);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.cardFavoriteButton {
+  left: 6px;
+}
+
+.cardMoreButton {
+  right: 6px;
+}
+
+.card:hover .cardAction,
+.card:focus-within .cardAction,
+.cardFavorite .cardFavoriteButton {
+  opacity: 1;
+}
+
+.cardFavorite .cardFavoriteButton {
+  color: var(--favorite);
+}
+
+/* Touch screens have no hover: the buttons stay visible. */
+@media (hover: none) {
+  .cardAction {
+    opacity: 1;
+  }
+}
+
+.createItem {
+  display: flex;
+}
+
+.createCard {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 108px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--border);
+  font: 500 13px/16px var(--font-sans);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease,
+    color 0.15s ease;
+}
+
+.createCard:hover {
+  background: var(--bg-component);
+  box-shadow: inset 0 0 0 1px var(--border-hover);
+  color: var(--text-primary);
+}
+
+/* ─── Board editor modal ───────────────────────────── */
+
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.editorTop {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.editorTopFields {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.preview {
+  flex-shrink: 0;
+  width: 132px;
+  height: 96px;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-sm);
+  background: var(--bg-component-hover);
+  box-shadow: inset 0 0 0 1px var(--border-subtle);
+  overflow: hidden;
+}
+
+.previewBody {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  min-width: 0;
+}
+
+.previewName {
+  font: 600 12px/16px var(--font-sans);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.previewMeta {
+  font: var(--text-subheadline);
+  color: var(--text-secondary);
+}
+
+.favoriteToggle {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  font: var(--text-body);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.favoriteOn {
+  color: var(--favorite);
+}
+
+.favoriteOff {
+  color: var(--text-secondary);
+}
+
+.settingsRows {
+  display: flex;
+  flex-direction: column;
+}
+
+.settingsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 10px 0;
+  border-top: 1px solid var(--border-subtle);
+  font: var(--text-body);
+}
+
+.settingsRows > .settingsRow:first-child {
+  border-top: 0;
+}
+
+.settingsLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settingsMuted {
+  color: var(--text-secondary);
+}
+
+/* Small switch, like the macOS one. */
+.switch {
+  appearance: none;
+  position: relative;
+  width: 26px;
+  height: 15px;
+  margin: 0;
+  border-radius: var(--radius-full);
+  background: var(--bg-component-active);
+  box-shadow: inset 0 0 0 1px var(--border);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  transition: transform 0.15s ease;
+}
+
+.switch:checked {
+  background: var(--accent-solid);
+  box-shadow: none;
+}
+
+.switch:checked::after {
+  transform: translateX(11px);
+  background: var(--on-accent);
+}
+
+.deleteButton {
+  margin-right: auto;
+  color: var(--danger-text);
+}

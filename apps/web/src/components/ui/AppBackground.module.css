@@ -1,0 +1,14 @@
+/* Fills the window behind the content; the still dot grid shows until the canvas draws. */
+.canvas {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+  background-color: var(--bg-page);
+  background-image: radial-gradient(circle at center, var(--backdrop-dot) 1px, transparent 1.5px);
+  background-size: 20px 20px;
+  background-position: 10px 10px;
+}

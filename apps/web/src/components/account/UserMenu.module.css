@@ -1,0 +1,123 @@
+.trigger {
+  font: 600 11px/1 var(--font-sans);
+}
+
+/* Panel under the avatar, aligned with the right edge of the header. */
+.panel {
+  position: fixed;
+  inset: 52px 12px auto auto;
+  margin: 0;
+  width: 300px;
+  padding: 6px;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--bg-component);
+  box-shadow:
+    var(--shadow-menu),
+    inset 0 0 0 1px var(--border-subtle);
+  color: var(--text-primary);
+}
+
+.panel:popover-open {
+  display: flex;
+  flex-direction: column;
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 10px 14px;
+}
+
+.identityText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.name {
+  font: var(--text-headline);
+}
+
+.detail {
+  font: var(--text-subheadline);
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.separator {
+  height: 1px;
+  margin: 6px 10px;
+  background: var(--border-subtle);
+}
+
+.identity + .separator {
+  margin-top: 0;
+}
+
+.sectionTitle {
+  margin: 0;
+  padding: 8px 10px 4px;
+  font: 600 11px/14px var(--font-sans);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 30px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  font: var(--text-body);
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+}
+
+.row:hover:not(:disabled) {
+  background: var(--bg-component-hover);
+  text-decoration: none;
+}
+
+.row:disabled {
+  cursor: default;
+  color: var(--text-tertiary);
+}
+
+.rowIcon {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+}
+
+.rowLabel {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.favoriteIcon {
+  flex-shrink: 0;
+  color: var(--favorite);
+}
+
+.trailing {
+  margin-left: auto;
+  font: var(--text-shortcut);
+  color: var(--text-tertiary);
+}
+
+.destructive,
+.destructive .rowIcon {
+  color: var(--danger-text);
+}

@@ -48,7 +48,9 @@ export async function updateSession(request: NextRequest) {
   if (!isSignedIn && (path === PROTECTED_PREFIX || path.startsWith(`${PROTECTED_PREFIX}/`))) {
     return redirectTo("/login");
   }
-  if (isSignedIn && AUTH_ROUTES.includes(path)) {
+  // "Cambiar de cuenta" opens Login (or Register) on top of the current session (?cambiar).
+  const isSwitchingAccount = request.nextUrl.searchParams.has("cambiar");
+  if (isSignedIn && AUTH_ROUTES.includes(path) && !isSwitchingAccount) {
     return redirectTo(PROTECTED_PREFIX);
   }
 
