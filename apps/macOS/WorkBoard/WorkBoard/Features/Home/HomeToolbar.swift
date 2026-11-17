@@ -19,7 +19,6 @@ struct HomeToolbar: ToolbarContent {
             Button("Crear", systemImage: "plus", action: onCreateBoard)
                 .labelStyle(.titleAndIcon)
                 .buttonStyle(.glassProminent)
-                .keyboardShortcut("n")
                 .help("Crear tablero (⌘N)")
         }
 

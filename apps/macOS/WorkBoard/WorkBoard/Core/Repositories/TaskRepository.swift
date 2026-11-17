@@ -70,6 +70,16 @@ final class TaskRepository: Sendable {
         }
     }
 
+    /// Inserts deleted tasks again with the same identifiers and data (undo).
+    func restore(_ tasks: [BoardTask]) async throws(DataFailure) {
+        guard !tasks.isEmpty else { return }
+        do {
+            try await client.from("board_tasks").insert(tasks).execute()
+        } catch {
+            throw DataFailure(error)
+        }
+    }
+
     func delete(_ taskID: UUID) async throws(DataFailure) {
         do {
             try await client

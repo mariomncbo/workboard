@@ -61,6 +61,16 @@ final class ListRepository: Sendable {
         }
     }
 
+    /// Inserts deleted lists again with the same identifiers and data (undo).
+    func restore(_ lists: [BoardList]) async throws(DataFailure) {
+        guard !lists.isEmpty else { return }
+        do {
+            try await client.from("board_lists").insert(lists).execute()
+        } catch {
+            throw DataFailure(error)
+        }
+    }
+
     /// Deletes the list; the database deletes its tasks.
     func delete(_ listID: UUID) async throws(DataFailure) {
         do {

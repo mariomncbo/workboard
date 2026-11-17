@@ -14,6 +14,7 @@ struct WorkspaceView: View {
     @State private var openBoard: Board?
     @State private var accountModal: AccountModal?
     @State private var accountDeletion: DeletionRequest?
+    @Environment(\.undoManager) private var undoManager
 
     init(
         profile: Profile,
@@ -25,7 +26,11 @@ struct WorkspaceView: View {
         self.boardRepository = boardRepository
         self.listRepository = listRepository
         self.taskRepository = taskRepository
-        _homeModel = State(initialValue: HomeModel(repository: boardRepository))
+        _homeModel = State(initialValue: HomeModel(
+            boardRepository: boardRepository,
+            listRepository: listRepository,
+            taskRepository: taskRepository
+        ))
     }
 
     var body: some View {
@@ -39,7 +44,8 @@ struct WorkspaceView: View {
                     taskRepository: taskRepository,
                     onGoHome: goHome,
                     onShowProfile: showProfile,
-                    onDeleteAccount: confirmAccountDeletion
+                    onDeleteAccount: confirmAccountDeletion,
+                    onDeleteBoard: homeModel.delete
                 )
                 .id(openBoard.id)
             } else {
@@ -56,6 +62,12 @@ struct WorkspaceView: View {
             ProfileModal(profile: profile, onClose: closeAccountModal)
         }
         .deletionConfirmation($accountDeletion)
+        .onAppear {
+            homeModel.undoManager = undoManager
+        }
+        .onDisappear {
+            undoManager?.removeAllActions(withTarget: homeModel)
+        }
     }
 
     private func open(_ board: Board) {

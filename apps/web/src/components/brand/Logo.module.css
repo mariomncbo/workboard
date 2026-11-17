@@ -1,0 +1,22 @@
+/* Proportions from the horizontal SVG: gap 24/100, name 52/100 of the symbol height. */
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--logo-height) * 0.24);
+  height: var(--logo-height);
+}
+
+.symbol {
+  width: var(--logo-height);
+  height: var(--logo-height);
+  flex-shrink: 0;
+}
+
+.name {
+  font-family: var(--font-display);
+  font-size: calc(var(--logo-height) * 0.52);
+  font-weight: 600;
+  letter-spacing: calc(var(--logo-height) * -0.016);
+  color: #eef0f4;
+  white-space: nowrap;
+}

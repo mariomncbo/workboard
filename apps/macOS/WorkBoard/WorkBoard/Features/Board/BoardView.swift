@@ -6,11 +6,17 @@ struct BoardView: View {
     let onGoHome: () -> Void
     let onShowProfile: () -> Void
     let onDeleteAccount: () -> Void
+    /// Deletes the board (through Home, so the deletion can be undone from there).
+    let onDeleteBoard: (Board) async throws(DataFailure) -> Void
 
     @State private var model: BoardModel
     @State private var activeModal: BoardModal?
     @State private var deletion: DeletionRequest?
     @State private var pointer = PointerTracker()
+    @State private var openPanel: BoardPanel?
+    @State private var pendingCommand: WorkspaceCommand?
+    @Environment(\.undoManager) private var undoManager
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     init(
         board: Board,
@@ -20,12 +26,14 @@ struct BoardView: View {
         taskRepository: TaskRepository,
         onGoHome: @escaping () -> Void,
         onShowProfile: @escaping () -> Void,
-        onDeleteAccount: @escaping () -> Void
+        onDeleteAccount: @escaping () -> Void,
+        onDeleteBoard: @escaping (Board) async throws(DataFailure) -> Void
     ) {
         self.profile = profile
         self.onGoHome = onGoHome
         self.onShowProfile = onShowProfile
         self.onDeleteAccount = onDeleteAccount
+        self.onDeleteBoard = onDeleteBoard
         _model = State(initialValue: BoardModel(
             board: board,
             boardRepository: boardRepository,
@@ -35,46 +43,32 @@ struct BoardView: View {
     }
 
     var body: some View {
-        ZStack {
-            if model.isLoading && model.lists.isEmpty {
-                ProgressView()
-                    .controlSize(.small)
-            } else if let failure = model.loadFailure, model.lists.isEmpty {
-                ContentUnavailableView {
-                    Label("No se ha podido cargar el tablero", systemImage: "wifi.exclamationmark")
-                } description: {
-                    Text(failure.message)
-                } actions: {
-                    Button("Reintentar", action: reload)
-                        .buttonStyle(.content(.secondary))
-                }
-            } else if model.lists.isEmpty {
-                EmptyBoardView(isOnColor: model.board.background != .dots, onAddList: showCreateList)
-            } else {
-                BoardListsRow(
-                    model: model,
-                    onRename: rename,
-                    onSetStyle: setStyle,
-                    onDelete: confirmDeletion,
-                    onOpenTask: openTask,
-                    onSetTaskColor: setColor,
-                    onDeleteTask: confirmTaskDeletion
-                )
+        HStack(spacing: 0) {
+            switch openPanel {
+            case .notes:
+                NotesPanel(onClose: closePanel)
+                    .transition(panelTransition)
+            case .planner:
+                PlannerPanel(onClose: closePanel)
+                    .transition(panelTransition)
+            case nil:
+                EmptyView()
             }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .overlay(alignment: .bottom) {
-            FloatingBar(onAddList: showCreateList)
-                .padding(.bottom, Spacing.s10)
-        }
-        .overlay(alignment: .top) {
-            if let failure = model.actionFailure {
-                ErrorBanner(message: failure.message, onDismiss: model.dismissActionFailure)
-                    .padding(.top, Spacing.s3)
-            }
-        }
-        .background {
-            BoardBackdrop(background: model.board.background, pointer: pointer)
+
+            BoardCanvas(
+                model: model,
+                pointer: pointer,
+                openPanel: openPanel,
+                onTogglePanel: togglePanel,
+                onReload: reload,
+                onAddList: showCreateList,
+                onRenameList: rename,
+                onSetListStyle: setStyle,
+                onDeleteList: confirmDeletion,
+                onOpenTask: openTask,
+                onSetTaskColor: setColor,
+                onDeleteTask: confirmTaskDeletion
+            )
         }
         .onContinuousHover(coordinateSpace: .global) { phase in
             pointer.handle(phase)
@@ -113,12 +107,63 @@ struct BoardView: View {
             }
         }
         .deletionConfirmation($deletion)
+        .focusedSceneValue(\.workspaceCommand, $pendingCommand)
+        .focusedSceneValue(
+            \.workspaceMenuState,
+            WorkspaceMenuState(
+                screen: .board(isFavorite: model.board.isFavorite, openPanel: openPanel),
+                isModalPresented: activeModal != nil || deletion != nil
+            )
+        )
+        .onChange(of: pendingCommand) { _, command in
+            guard let command else { return }
+            pendingCommand = nil
+            perform(command)
+        }
+        .onAppear {
+            model.undoManager = undoManager
+        }
+        .onDisappear {
+            // Board changes can only be undone while the board is open.
+            undoManager?.removeAllActions(withTarget: model)
+        }
         .task {
             await model.load()
         }
     }
 
     // MARK: - Actions
+
+    /// Performs a menu bar command that applies to a board.
+    private func perform(_ command: WorkspaceCommand) {
+        switch command {
+        case .addList: showCreateList()
+        case .toggleFavorite: toggleFavorite()
+        case .showBoardSettings: showSettings()
+        case .deleteBoard: confirmBoardDeletion()
+        case .togglePanel(let panel): togglePanel(panel)
+        case .goHome: onGoHome()
+        case .createBoard, .findBoards: break
+        }
+    }
+
+    /// Panels slide in from the left; with Reduce Motion they only fade.
+    private var panelTransition: AnyTransition {
+        reduceMotion ? .opacity : .move(edge: .leading).combined(with: .opacity)
+    }
+
+    /// Opens a panel (closing the other one), or closes it if it is already open.
+    private func togglePanel(_ panel: BoardPanel) {
+        withAnimation(reduceMotion ? .easeInOut(duration: 0.2) : .spring(duration: 0.3)) {
+            openPanel = openPanel == panel ? nil : panel
+        }
+    }
+
+    private func closePanel() {
+        withAnimation(reduceMotion ? .easeInOut(duration: 0.2) : .spring(duration: 0.3)) {
+            openPanel = nil
+        }
+    }
 
     private func reload() {
         Task {
@@ -127,21 +172,15 @@ struct BoardView: View {
     }
 
     private func toggleFavorite() {
-        Task {
-            await model.toggleFavorite()
-        }
+        model.toggleFavorite()
     }
 
     private func rename(_ list: BoardList, to name: String) {
-        Task {
-            await model.rename(list, to: name)
-        }
+        model.rename(list, to: name)
     }
 
     private func setStyle(_ list: BoardList, _ style: BoardListStyle) {
-        Task {
-            await model.setStyle(style, of: list)
-        }
+        model.setStyle(style, of: list)
     }
 
     private func openTask(_ task: BoardTask) {
@@ -149,9 +188,7 @@ struct BoardView: View {
     }
 
     private func setColor(_ task: BoardTask, _ color: PaletteColor?) {
-        Task {
-            await model.setColor(color, of: task)
-        }
+        model.setColor(color, of: task)
     }
 
     private func showSettings() {
@@ -202,7 +239,7 @@ struct BoardView: View {
             message: message,
             actionTitle: "Eliminar tablero"
         ) {
-            try await model.deleteBoard()
+            try await onDeleteBoard(model.board)
             activeModal = nil
             onGoHome()
         }

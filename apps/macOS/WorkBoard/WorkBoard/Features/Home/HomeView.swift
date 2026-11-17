@@ -10,6 +10,8 @@ struct HomeView: View {
 
     @State private var activeModal: HomeModal?
     @State private var deletion: DeletionRequest?
+    @State private var pendingCommand: WorkspaceCommand?
+    @FocusState private var isSearchFocused: Bool
 
     var body: some View {
         ScrollView {
@@ -71,6 +73,7 @@ struct HomeView: View {
         }
         .toolbar(removing: .title)
         .searchable(text: $model.searchText, placement: .toolbarPrincipal, prompt: "Buscar tableros")
+        .searchFocused($isSearchFocused)
         .modal(item: $activeModal) { modal in
             switch modal {
             case .createBoard:
@@ -85,12 +88,31 @@ struct HomeView: View {
             }
         }
         .deletionConfirmation($deletion)
+        .focusedSceneValue(\.workspaceCommand, $pendingCommand)
+        .focusedSceneValue(
+            \.workspaceMenuState,
+            WorkspaceMenuState(screen: .home, isModalPresented: activeModal != nil || deletion != nil)
+        )
+        .onChange(of: pendingCommand) { _, command in
+            guard let command else { return }
+            pendingCommand = nil
+            perform(command)
+        }
         .task {
             await model.load()
         }
     }
 
     // MARK: - Actions
+
+    /// Performs a menu bar command that applies to Home.
+    private func perform(_ command: WorkspaceCommand) {
+        switch command {
+        case .createBoard: showCreateBoard()
+        case .findBoards: isSearchFocused = true
+        default: break
+        }
+    }
 
     private func reload() {
         Task {
@@ -99,9 +121,7 @@ struct HomeView: View {
     }
 
     private func toggleFavorite(_ board: Board) {
-        Task {
-            await model.toggleFavorite(board)
-        }
+        model.toggleFavorite(board)
     }
 
     private func showCreateBoard() {

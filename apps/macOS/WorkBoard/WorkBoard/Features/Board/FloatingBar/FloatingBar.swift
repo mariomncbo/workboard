@@ -1,19 +1,29 @@
 import SwiftUI
 
 /// Glass bar centered at the bottom of the board: Notas, Planificador | Añade una lista.
-/// Notes and Planner panels are not built yet, so their buttons are disabled.
+/// The button of the open panel is highlighted; pressing it again closes the panel.
 struct FloatingBar: View {
+    let openPanel: BoardPanel?
+    let onTogglePanel: (BoardPanel) -> Void
     let onAddList: () -> Void
 
     var body: some View {
         GlassEffectContainer {
             HStack(spacing: 2) {
-                FloatingBarButton(title: "Notas", systemImage: "note.text", action: {})
-                    .disabled(true)
-                    .help("Próximamente")
-                FloatingBarButton(title: "Planificador", systemImage: "calendar", action: {})
-                    .disabled(true)
-                    .help("Próximamente")
+                FloatingBarButton(
+                    title: "Notas",
+                    systemImage: BoardPanel.notes.systemImage,
+                    isActive: openPanel == .notes
+                ) {
+                    onTogglePanel(.notes)
+                }
+                FloatingBarButton(
+                    title: "Planificador",
+                    systemImage: BoardPanel.planner.systemImage,
+                    isActive: openPanel == .planner
+                ) {
+                    onTogglePanel(.planner)
+                }
 
                 Rectangle()
                     .fill(Color.white.opacity(0.14))

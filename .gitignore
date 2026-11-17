@@ -86,3 +86,8 @@ CLAUDE.md
 .claude/
 .agents/
 skills-lock.json
+
+# ─────────────────────────────────────────────
+# Playwright MCP (capturas y registros locales)
+# ─────────────────────────────────────────────
+.playwright-mcp/

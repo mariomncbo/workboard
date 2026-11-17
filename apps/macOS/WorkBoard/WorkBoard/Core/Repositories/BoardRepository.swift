@@ -79,6 +79,15 @@ final class BoardRepository: Sendable {
         }
     }
 
+    /// Inserts a deleted board again with the same identifier and data (undo).
+    func restore(_ board: Board) async throws(DataFailure) {
+        do {
+            try await client.from("boards").insert(board).execute()
+        } catch {
+            throw DataFailure(error)
+        }
+    }
+
     /// Deletes the board; the database deletes its lists and tasks.
     func delete(_ boardID: UUID) async throws(DataFailure) {
         do {

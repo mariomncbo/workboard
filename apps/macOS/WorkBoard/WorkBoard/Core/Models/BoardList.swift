@@ -1,7 +1,7 @@
 import Foundation
 
 /// A list inside a board (`board_lists` table), with its number of tasks.
-nonisolated struct BoardList: Decodable, Equatable, Identifiable, Sendable {
+nonisolated struct BoardList: Codable, Equatable, Identifiable, Sendable {
     static let maximumNameLength = 100
 
     let id: UUID
@@ -43,5 +43,15 @@ nonisolated struct BoardList: Decodable, Equatable, Identifiable, Sendable {
         style = try container.decode(BoardListStyle.self, forKey: .style)
         position = try container.decode(Double.self, forKey: .position)
         taskCount = try container.decodeIfPresent([TaskCount].self, forKey: .tasks)?.first?.count ?? 0
+    }
+
+    /// Encodes the list's own columns (not the task count), to restore it after an undo.
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(boardID, forKey: .boardID)
+        try container.encode(name, forKey: .name)
+        try container.encode(style, forKey: .style)
+        try container.encode(position, forKey: .position)
     }
 }
