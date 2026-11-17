@@ -1,0 +1,641 @@
+/* ─── Page ─────────────────────────────────────────── */
+
+.page {
+  position: relative;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  overflow-x: clip;
+}
+
+/* The page dot grid (fixed) and the particle symbol (inside the hero stage). */
+.grid {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Fixed header ─────────────────────────────────── */
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background: linear-gradient(to bottom, var(--bg-page) 35%, rgba(10, 11, 13, 0));
+}
+
+.headerInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 22px 40px 30px;
+}
+
+.brand {
+  display: inline-flex;
+  border-radius: var(--radius-xs);
+}
+
+.nav {
+  display: flex;
+  gap: 28px;
+}
+
+.navLink,
+.footerLink {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font: var(--text-body);
+}
+
+.navLink:hover,
+.footerLink:hover {
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+/* ─── Buttons (glass and accent, as in the app header) ── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 18px;
+  border-radius: var(--radius-full);
+  font: 600 15px/20px var(--font-sans);
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color 0.15s ease,
+    transform 0.12s ease;
+}
+
+.btn:hover {
+  text-decoration: none;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btnPrimary {
+  background: var(--accent-solid);
+  color: var(--on-accent);
+  box-shadow:
+    inset 0 1px 0 var(--glass-stroke),
+    var(--shadow-glass);
+}
+
+.btnPrimary:hover {
+  background: var(--accent-solid-hover);
+  color: var(--on-accent);
+}
+
+.btnGlass {
+  background: var(--glass-fill);
+  color: var(--text-primary);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 var(--glass-stroke),
+    inset 0 0 0 1px var(--glass-stroke),
+    0 0 0 0.5px var(--glass-edge),
+    var(--shadow-glass);
+}
+
+.btnGlass:hover {
+  background: var(--glass-fill-hover);
+  color: var(--text-primary);
+}
+
+.btnSmall {
+  height: 32px;
+  padding: 0 14px;
+  font: 600 13px/16px var(--font-sans);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .btnGlass {
+    background: var(--bg-component);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+.ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* ─── Hero stage ───────────────────────────────────── */
+
+.stage {
+  position: relative;
+  height: calc(100vh + 120vh);
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  min-height: 640px;
+  overflow: hidden;
+}
+
+.symbol {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+
+/* Text styles shared by the ghosts and the visible words. */
+.textTitle,
+.mover_h1 {
+  margin: 0;
+  font: 700 56px/60px var(--font-display);
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+
+.textLead,
+.mover_lead {
+  margin: 0;
+  font: 400 18px/27px var(--font-sans);
+  color: var(--text-secondary);
+}
+
+.textAside,
+.mover_aside {
+  margin: 0;
+  font: 400 15px/22px var(--font-sans);
+  color: var(--text-secondary);
+}
+
+.textNote,
+.mover_note {
+  margin: 0;
+  font: var(--text-callout);
+  color: var(--text-tertiary);
+}
+
+/* The two layouts, invisible: measured to know where each word goes. */
+.ghost {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Measured words take the whole line height, like the visible ones. */
+.ghostWord {
+  display: inline-block;
+}
+
+.ghostAOverlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 40px 56px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.ghostAMain {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 560px;
+}
+
+.ghostAAside {
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: right;
+}
+
+.ghostB {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ghostBSymbol {
+  width: 100%;
+  height: 46vh;
+  min-height: 320px;
+  flex-shrink: 0;
+}
+
+.ghostBCopy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  text-align: center;
+  max-width: 760px;
+  padding: 0 24px;
+  margin-top: -40px;
+}
+
+.ghostBCopy .ctas {
+  justify-content: center;
+}
+
+.ghostBLead {
+  max-width: 600px;
+}
+
+.ghostBNote {
+  max-width: 520px;
+}
+
+/* What is seen: each word and the buttons, moved by the script. */
+.movers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.mover {
+  position: absolute;
+  left: 0;
+  top: 0;
+  white-space: nowrap;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.moverCtas {
+  pointer-events: auto;
+  flex-wrap: nowrap;
+}
+
+.cue {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-tertiary);
+  font: var(--text-callout);
+}
+
+/* The window rests where it peeks in layout B when the transition ends (set by the script). */
+.peek {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100vh + 120vh);
+  width: min(1120px, calc(100% - 48px));
+  margin: 0 auto;
+  z-index: 2;
+}
+
+/* ─── The app window with the video ────────────────── */
+
+.window {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--neutral-1);
+  box-shadow:
+    0 0 0 1px var(--border),
+    0 50px 140px rgba(0, 0, 0, 0.75),
+    0 0 120px rgba(73, 141, 229, 0.1);
+}
+
+.titlebar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 14px;
+  background: var(--neutral-2);
+  box-shadow: inset 0 -1px 0 var(--border-subtle);
+}
+
+.titlebar i {
+  display: block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.trafficRed {
+  background: #ff5f57;
+}
+
+.trafficYellow {
+  background: #febc2e;
+}
+
+.trafficGreen {
+  background: #28c840;
+}
+
+.titlebar span {
+  flex: 1;
+  margin-right: 56px;
+  text-align: center;
+  font: var(--text-subheadline);
+  color: var(--text-tertiary);
+}
+
+.videoBox {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background-color: var(--bg-page);
+  background-image: radial-gradient(circle at center, var(--backdrop-dot) 0.8px, transparent 1.2px);
+  background-size: 12px 12px;
+}
+
+.video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.playButton {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--glass-fill);
+  color: var(--text-primary);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  box-shadow:
+    inset 0 0 0 1px var(--glass-stroke),
+    var(--shadow-glass);
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+/* While playing, the button only shows on hover or keyboard focus. */
+.playButtonHidden {
+  opacity: 0;
+}
+
+.window:hover .playButtonHidden,
+.playButton:focus-visible {
+  opacity: 1;
+}
+
+/* ─── Sections ─────────────────────────────────────── */
+
+.after {
+  height: 70vh;
+}
+
+.section {
+  position: relative;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 40px 40px 120px;
+  scroll-margin-top: 72px;
+}
+
+.sectionTitle {
+  margin: 0;
+  max-width: 640px;
+  font: 700 40px/46px var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+.sectionLead {
+  margin: 14px 0 0;
+  max-width: 640px;
+  font: 400 18px/27px var(--font-sans);
+  color: var(--text-secondary);
+}
+
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: 112px;
+  margin-top: 64px;
+}
+
+.feature {
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+  gap: 56px;
+  align-items: center;
+}
+
+.featureFlip > :first-child {
+  order: 2;
+}
+
+.featureText {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.featureTitle {
+  margin: 0;
+  font: 600 24px/30px var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+.featureBody {
+  margin: 0;
+  font: 400 16px/25px var(--font-sans);
+  color: var(--text-secondary);
+}
+
+.shot {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--bg-component);
+  box-shadow:
+    0 0 0 1px var(--border-subtle),
+    0 30px 80px rgba(0, 0, 0, 0.5);
+}
+
+.shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.swatches span {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 28px;
+  margin-top: 40px;
+}
+
+.pairItem {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pairTitle {
+  margin: 0;
+  font: 600 20px/26px var(--font-display);
+}
+
+.closing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  padding: 72px 24px;
+  border-radius: 20px;
+  background: var(--bg-subtle);
+  box-shadow: inset 0 0 0 1px var(--border-subtle);
+  text-align: center;
+}
+
+.closing .ctas {
+  justify-content: center;
+}
+
+.footer {
+  position: relative;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 40px 40px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: inset 0 1px 0 var(--border-subtle);
+}
+
+.footerBrand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: var(--text-callout);
+  color: var(--text-secondary);
+}
+
+.footerNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.footerLink {
+  font: var(--text-callout);
+}
+
+/* ─── Narrow screens ───────────────────────────────── */
+
+@media (max-width: 860px) {
+  .headerInner {
+    padding: 16px 20px 24px;
+  }
+
+  .nav {
+    display: none;
+  }
+
+  .textTitle,
+  .mover_h1 {
+    font-size: 38px;
+    line-height: 42px;
+  }
+
+  .ghostAOverlay {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 20px 64px;
+  }
+
+  .ghostAAside {
+    text-align: left;
+  }
+
+  .section {
+    padding: 32px 20px 88px;
+  }
+
+  .sectionTitle {
+    font-size: 28px;
+    line-height: 32px;
+  }
+
+  .feature,
+  .pair {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .featureFlip > :first-child {
+    order: 0;
+  }
+
+  .features {
+    gap: 72px;
+    margin-top: 40px;
+  }
+
+  .footer {
+    padding: 24px 20px 32px;
+  }
+}
+
+.closingSymbol {
+  width: 48px;
+  height: 48px;
+}
+
+.footerSymbol {
+  width: 18px;
+  height: 18px;
+}

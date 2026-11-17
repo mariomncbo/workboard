@@ -39,6 +39,8 @@ export function useBoardDragAndDrop(board: BoardController) {
   /** The list a dragged task is in right now: highlighted as the drop target. */
   const [dropListId, setDropListId] = useState<string | null>(null);
   const snapshot = useRef<TasksByList | null>(null);
+  /** With the keyboard there is no pointer: only the dragged rectangle moves. */
+  const isKeyboardDrag = useRef(false);
   const origin = useRef<{ listId: string; position: number } | null>(null);
 
   const sensors = useSensors(
@@ -57,6 +59,20 @@ export function useBoardDragAndDrop(board: BoardController) {
   const nameOf = (id: UniqueIdentifier) =>
     board.findTask(String(id))?.name ?? board.lists.find((list) => list.id === id)?.name ?? "";
 
+  /**
+   * Where a dragged task will end up if dropped now, in the list it is in: the place of the
+   * task it is over (like `onDragEnd`), or where it already is.
+   */
+  function projectedIndex(taskId: string, overId: string) {
+    const task = board.findTask(taskId);
+    if (!task) return 0;
+    const listTasks = board.tasksRef.current[task.listId] ?? [];
+    const overTask = board.findTask(overId);
+    const current = listTasks.findIndex((item) => item.id === taskId);
+    if (!overTask || overTask.listId !== task.listId || overTask.id === taskId) return current;
+    return listTasks.findIndex((item) => item.id === overTask.id);
+  }
+
   /** Lists only collide with lists; tasks prefer the task under the pointer. */
   const collisionDetection: CollisionDetection = (args) => {
     const type = typeOf(args.active.data);
@@ -64,21 +80,24 @@ export function useBoardDragAndDrop(board: BoardController) {
     if (type === "list") {
       return closestCenter({ ...args, droppableContainers: containers.filter((c) => typeOf(c.data) === "list") });
     }
+    if (isKeyboardDrag.current) return closestCorners(args);
     const hits = pointerWithin(args);
-    const taskHit = hits.find((hit) => typeOf(containers.find((c) => c.id === hit.id)?.data) === "task" && hit.id !== args.active.id);
+    // The dragged task itself counts: over its own place, dropping leaves it where it was.
+    const taskHit = hits.find((hit) => typeOf(containers.find((c) => c.id === hit.id)?.data) === "task");
     if (taskHit) return [taskHit];
     const listHit = hits.find((hit) => typeOf(containers.find((c) => c.id === hit.id)?.data) === "list");
     if (listHit) {
       // Over a list but between tasks: the closest of its tasks, or the list itself if empty.
       const listTasks = (board.tasksRef.current[String(listHit.id)] ?? []).map((task) => task.id);
-      const taskContainers = containers.filter((c) => listTasks.includes(String(c.id)) && c.id !== args.active.id);
+      const taskContainers = containers.filter((c) => listTasks.includes(String(c.id)));
       return taskContainers.length ? closestCenter({ ...args, droppableContainers: taskContainers }) : [listHit];
     }
-    // Keyboard, or the pointer outside every list.
-    return closestCorners({ ...args, droppableContainers: containers.filter((c) => c.id !== args.active.id) });
+    // The pointer outside every list.
+    return closestCorners(args);
   };
 
-  function onDragStart({ active }: DragStartEvent) {
+  function onDragStart({ active, activatorEvent }: DragStartEvent) {
+    isKeyboardDrag.current = activatorEvent instanceof KeyboardEvent;
     const type = typeOf(active.data) ?? "task";
     setActiveItem({ type, id: String(active.id) });
     if (type === "task") {
@@ -160,8 +179,8 @@ export function useBoardDragAndDrop(board: BoardController) {
       if (typeOf(active.data) === "list") return `«${nameOf(active.id)}» está en el lugar de «${nameOf(over.id)}».`;
       const task = board.findTask(String(active.id));
       if (!task) return undefined;
-      const position = (board.tasksRef.current[task.listId] ?? []).findIndex((t) => t.id === task.id) + 1;
-      return `«${task.name}» está en la posición ${position} de la lista «${listName(task.listId)}».`;
+      const listTasks = board.tasksRef.current[task.listId] ?? [];
+      return `«${task.name}» está en la posición ${projectedIndex(task.id, String(over.id)) + 1} de ${listTasks.length} de la lista «${listName(task.listId)}».`;
     },
     onDragEnd: ({ active, over }) => {
       if (!over) return `Has soltado «${nameOf(active.id)}» fuera de las listas. Vuelve a su sitio.`;

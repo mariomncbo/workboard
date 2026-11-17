@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import "@/styles/tokens.css";
 import "./globals.css";
+import { siteUrl } from "@/lib/siteUrl";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl()),
   title: {
     default: "WorkBoard",
     template: "%s · WorkBoard",

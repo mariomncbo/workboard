@@ -63,6 +63,20 @@ export function listRepository(supabase: SupabaseClient) {
     setStyle: (listId: string, style: BoardListStyle) => update(listId, { style }),
     setPosition: (listId: string, position: number) => update(listId, { position }),
 
+    /** Inserts deleted lists again with the same identifiers and data (undo). */
+    async restore(lists: BoardList[]): Promise<void> {
+      if (lists.length === 0) return;
+      const rows = lists.map((list) => ({
+        id: list.id,
+        board_id: list.boardId,
+        name: list.name,
+        style: list.style,
+        position: list.position,
+      }));
+      const { error } = await supabase.from("board_lists").insert(rows);
+      if (error) throw toDataFailure(error);
+    },
+
     /** Deletes the list; the database deletes its tasks. */
     async delete(listId: string): Promise<void> {
       const { error } = await supabase.from("board_lists").delete().eq("id", listId);

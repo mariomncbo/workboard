@@ -48,6 +48,12 @@
   color: var(--text-secondary);
 }
 
+/* A link inside a sentence is underlined: its color alone is not enough to tell it apart. */
+.footnote a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 /* A button that looks like a link: "Crear una cuenta", "¿Olvidaste la contraseña?". */
 .textLink {
   padding: 0;

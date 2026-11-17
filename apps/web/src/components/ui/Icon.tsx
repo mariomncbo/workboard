@@ -63,6 +63,10 @@ const PATHS = {
   ),
   signOut: <path d="M6.5 3H4a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h2.5M10 5.5 12.5 8 10 10.5M12.5 8H6.5" strokeLinejoin="round" />,
   arrowUpRight: <path d="M6 3h7v7M13 3 4 12" strokeLinejoin="round" />,
+  download: <path d="M8 2.5v8M4.5 7 8 10.5 11.5 7M3 13.5h10" strokeLinejoin="round" />,
+  chevronDown: <path d="M4 6l4 4 4-4" />,
+  play: <path d="M5 3.5v9l7.5-4.5z" fill="currentColor" strokeLinejoin="round" />,
+  pause: <path d="M5.5 3.5v9M10.5 3.5v9" strokeWidth={2.2} />,
   sliders: <path d="M3 5h6M12 5h1M3 11h1M7 11h6M9 3.5v3M4 9.5v3" />,
   boards: (
     <>

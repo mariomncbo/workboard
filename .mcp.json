@@ -13,6 +13,10 @@
       "type": "http",
       "url": "https://netlify-mcp.netlify.app/mcp"
     },
+    "motionsites": {
+      "type": "http",
+      "url": "https://motionsites.ai/api/mcp"
+    },
     "playwright": {
       "type": "stdio",
       "command": "npx",

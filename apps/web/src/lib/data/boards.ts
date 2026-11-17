@@ -163,6 +163,19 @@ export function boardRepository(supabase: SupabaseClient) {
       if (error) throw toDataFailure(error);
     },
 
+    /** Inserts a deleted board again with the same identifier and data (undo). */
+    async restore(board: Board): Promise<void> {
+      const { error } = await supabase.from("boards").insert({
+        id: board.id,
+        name: board.name,
+        description: board.description,
+        background: board.background,
+        is_favorite: board.isFavorite,
+        created_at: board.createdAt,
+      });
+      if (error) throw toDataFailure(error);
+    },
+
     /** Deletes the board; the database deletes its lists and tasks. */
     async delete(boardId: string): Promise<void> {
       const { error } = await supabase.from("boards").delete().eq("id", boardId);

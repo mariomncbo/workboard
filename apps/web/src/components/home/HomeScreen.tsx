@@ -7,19 +7,11 @@ import { ConfirmDeletionDialog } from "@/components/ui/ConfirmDeletionDialog";
 import { ErrorBanner } from "@/components/ui/ErrorBanner";
 import { GlassButton, GlassSearchField } from "@/components/ui/Glass";
 import { Icon } from "@/components/ui/Icon";
-import {
-  EMPTY_SUMMARY,
-  boardDeletionMessage,
-  boardRepository,
-  sortAndFilterBoards,
-  type Board,
-  type BoardDraft,
-  type BoardSummary,
-} from "@/lib/data/boards";
-import { DataFailureError, dataFailureMessage } from "@/lib/data/dataFailure";
-import { createClient } from "@/lib/supabase/client";
+import { boardDeletionMessage, sortAndFilterBoards, type Board, type BoardSummary } from "@/lib/data/boards";
+import { useUndoShortcuts } from "@/lib/useUndoShortcuts";
 import { BoardCard } from "./BoardCard";
 import { BoardEditorModal, type BoardEditorMode } from "./BoardEditorModal";
+import { useHome } from "./useHome";
 import styles from "./home.module.css";
 
 type HomeScreenProps = {
@@ -29,51 +21,14 @@ type HomeScreenProps = {
 
 /** Home: "Mi espacio de trabajo" with the user's boards, favorites first. */
 export function HomeScreen({ initialBoards, initialSummaries }: HomeScreenProps) {
-  const [repository] = useState(() => boardRepository(createClient()));
-  const [boards, setBoards] = useState(initialBoards);
-  const [summaries, setSummaries] = useState(initialSummaries);
+  const { undoManager, undoMessage } = useUndoShortcuts();
+  const home = useHome({ boards: initialBoards, summaries: initialSummaries }, undoManager);
+  const { boards, summaryOf } = home;
   const [searchText, setSearchText] = useState("");
   const [editor, setEditor] = useState<BoardEditorMode | null>(null);
   const [deletion, setDeletion] = useState<Board | null>(null);
-  /** A change that could not be saved. */
-  const [actionError, setActionError] = useState<string | null>(null);
 
   const visibleBoards = sortAndFilterBoards(boards, searchText);
-  const summaryOf = (board: Board) => summaries[board.id] ?? EMPTY_SUMMARY;
-  const replace = (board: Board) => setBoards((current) => current.map((item) => (item.id === board.id ? board : item)));
-
-  async function createBoard(draft: BoardDraft) {
-    const board = await repository.create(draft);
-    setBoards((current) => [...current, board]);
-  }
-
-  async function updateBoard(board: Board, draft: BoardDraft) {
-    replace(await repository.update(board.id, draft));
-  }
-
-  /** Shown on screen right away; if saving fails, it goes back and the error is shown. */
-  async function toggleFavorite(board: Board) {
-    const isFavorite = !board.isFavorite;
-    replace({ ...board, isFavorite });
-    setActionError(null);
-    try {
-      await repository.setFavorite(board.id, isFavorite);
-    } catch (failure) {
-      replace(board);
-      setActionError(failure instanceof DataFailureError ? failure.message : dataFailureMessage("unexpected"));
-    }
-  }
-
-  async function deleteBoard(board: Board) {
-    await repository.delete(board.id);
-    setBoards((current) => current.filter((item) => item.id !== board.id));
-    setSummaries((current) => {
-      const next = { ...current };
-      delete next[board.id];
-      return next;
-    });
-    setEditor(null);
-  }
 
   const showCreateBoard = () => setEditor({ kind: "create" });
   const showSettings = (board: Board) => setEditor({ kind: "settings", board, summary: summaryOf(board) });
@@ -125,7 +80,7 @@ export function HomeScreen({ initialBoards, initialSummaries }: HomeScreenProps)
                 key={board.id}
                 board={board}
                 summary={summaryOf(board)}
-                onToggleFavorite={() => toggleFavorite(board)}
+                onToggleFavorite={() => home.toggleFavorite(board.id)}
                 onShowSettings={() => showSettings(board)}
                 onDelete={() => setDeletion(board)}
               />
@@ -139,19 +94,23 @@ export function HomeScreen({ initialBoards, initialSummaries }: HomeScreenProps)
         )}
       </main>
 
-      {actionError && (
+      <p className="visually-hidden" role="status" aria-live="polite">
+        {undoMessage}
+      </p>
+
+      {home.actionError && (
         <div className={styles.banner}>
-          <ErrorBanner message={actionError} onDismiss={() => setActionError(null)} />
+          <ErrorBanner message={home.actionError} onDismiss={home.dismissActionError} />
         </div>
       )}
 
       {editor?.kind === "create" && (
-        <BoardEditorModal mode={editor} onSave={createBoard} onClose={() => setEditor(null)} />
+        <BoardEditorModal mode={editor} onSave={home.createBoard} onClose={() => setEditor(null)} />
       )}
       {editor?.kind === "settings" && (
         <BoardEditorModal
           mode={editor}
-          onSave={(draft) => updateBoard(editor.board, draft)}
+          onSave={(draft) => home.updateBoard(editor.board.id, draft)}
           onDelete={() => setDeletion(editor.board)}
           onClose={() => setEditor(null)}
         />
@@ -161,7 +120,10 @@ export function HomeScreen({ initialBoards, initialSummaries }: HomeScreenProps)
           title={`¿Eliminar «${deletion.name}»?`}
           message={boardDeletionMessage(summaryOf(deletion))}
           actionLabel="Eliminar tablero"
-          onConfirm={() => deleteBoard(deletion)}
+          onConfirm={async () => {
+            await home.deleteBoard(deletion.id);
+            setEditor(null);
+          }}
           onClose={() => setDeletion(null)}
         />
       )}

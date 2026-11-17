@@ -17,6 +17,7 @@ import { boardDeletionMessage, type Board } from "@/lib/data/boards";
 import type { BoardList } from "@/lib/data/lists";
 import type { BoardTask } from "@/lib/data/tasks";
 import { paletteVar } from "@/lib/palette";
+import { useUndoShortcuts } from "@/lib/useUndoShortcuts";
 import { FloatingBar, SidePanel, type BoardPanel } from "./BoardPanels";
 import { CreateListModal } from "./CreateListModal";
 import { ListColumn, ListDragPreview, listTheme } from "./ListColumn";
@@ -36,7 +37,8 @@ type Deletion =
 /** An open board: its lists side by side over its background, the panels and the floating bar. */
 export function BoardScreen(initial: { board: Board; lists: BoardList[]; tasks: BoardTask[] }) {
   const router = useRouter();
-  const board = useBoard(initial);
+  const { undoManager, undoMessage } = useUndoShortcuts();
+  const board = useBoard(initial, undoManager);
   const dnd = useBoardDragAndDrop(board);
   const [modal, setModal] = useState<Modal | null>(null);
   const [deletion, setDeletion] = useState<Deletion | null>(null);
@@ -173,6 +175,10 @@ export function BoardScreen(initial: { board: Board; lists: BoardList[]; tasks: 
           onTogglePanel={(panel) => setOpenPanel((current) => (current === panel ? null : panel))}
           onAddList={showCreateList}
         />
+
+        <p className="visually-hidden" role="status" aria-live="polite">
+          {undoMessage}
+        </p>
 
         {board.actionError && (
           <div className={styles.banner}>

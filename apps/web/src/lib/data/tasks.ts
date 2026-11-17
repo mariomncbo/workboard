@@ -113,6 +113,21 @@ export function taskRepository(supabase: SupabaseClient) {
       if (error) throw toDataFailure(error);
     },
 
+    /** Inserts deleted tasks again with the same identifiers and data (undo). */
+    async restore(tasks: BoardTask[]): Promise<void> {
+      if (tasks.length === 0) return;
+      const rows = tasks.map((task) => ({
+        id: task.id,
+        list_id: task.listId,
+        name: task.name,
+        description: task.description,
+        color: task.color,
+        position: task.position,
+      }));
+      const { error } = await supabase.from("board_tasks").insert(rows);
+      if (error) throw toDataFailure(error);
+    },
+
     async delete(taskId: string): Promise<void> {
       const { error } = await supabase.from("board_tasks").delete().eq("id", taskId);
       if (error) throw toDataFailure(error);
