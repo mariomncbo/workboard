@@ -6,6 +6,8 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Everything except static files and images.
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|icon.svg|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
+  // Only the routes that read the session on the server. The landing, its media and the .dmg
+  // never touch it, so they are served straight from the CDN (on Netlify the proxy is a
+  // function, and every call counts towards the plan).
+  matcher: ["/app/:path*", "/login", "/registro", "/restablecer-contrasena", "/auth/:path*"],
 };

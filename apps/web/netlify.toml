@@ -1,0 +1,21 @@
+# Netlify: the web version of WorkBoard (https://getworkboard.netlify.app).
+# Deployed by hand from this folder with the Netlify CLI (`netlify deploy --build --prod`).
+# Next.js runs on Netlify's OpenNext adapter, which Netlify installs on its own.
+# Environment variables (Supabase URL and publishable key, site URL) live in Netlify,
+# not here: this file is versioned.
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+# The Mac app. It is not versioned in git: apps/macOS/scripts/make-dmg.sh builds it and it is
+# copied to public/descargas before deploying.
+[[headers]]
+  for = "/descargas/*.dmg"
+  [headers.values]
+    Content-Type = "application/x-apple-diskimage"
+    Content-Disposition = "attachment; filename=\"WorkBoard.dmg\""
+    Cache-Control = "public, max-age=0, must-revalidate"

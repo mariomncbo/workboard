@@ -652,3 +652,21 @@
 .pairShot img {
   height: auto;
 }
+
+/* Content appearing as it enters the screen (RevealOnScroll). Only hidden once the
+   component is running; with "Reduce motion" it never starts. */
+.page[data-reveal-ready] [data-reveal] {
+  transition:
+    opacity 700ms cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms),
+    transform 700ms cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms);
+}
+
+.page[data-reveal-ready] [data-reveal]:not([data-shown]) {
+  opacity: 0;
+  transform: translateY(28px);
+}
+
+/* Screenshots also grow slightly, like a window opening. */
+.page[data-reveal-ready] .shot[data-reveal]:not([data-shown]) {
+  transform: translateY(36px) scale(0.97);
+}

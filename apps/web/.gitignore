@@ -48,3 +48,9 @@ next-env.d.ts
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# netlify (local link to the site)
+.netlify
+
+# The Mac app's .dmg is copied here before each deploy (apps/macOS/scripts/make-dmg.sh)
+/public/descargas/*.dmg

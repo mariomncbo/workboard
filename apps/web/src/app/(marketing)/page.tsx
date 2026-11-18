@@ -1,8 +1,10 @@
+import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Logo, LogoSymbol } from "@/components/brand/Logo";
 import { LandingHero } from "@/components/landing/LandingHero";
+import { RevealOnScroll } from "@/components/landing/RevealOnScroll";
 import { DOWNLOAD_URL } from "@/components/landing/landingCopy";
 import styles from "@/components/landing/landing.module.css";
 import { LINKS } from "@/lib/links";
@@ -26,10 +28,32 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image" },
 };
 
-/** A real screenshot of the app, with its frame. */
-function Shot({ src, alt, width, height, className }: { src: string; alt: string; width: number; height: number; className?: string }) {
+/** Delay of an element that appears after another one of its group (RevealOnScroll). */
+function revealDelay(milliseconds: number): CSSProperties {
+  return { "--reveal-delay": `${milliseconds}ms` } as CSSProperties;
+}
+
+/**
+ * A real screenshot of the app, with its frame. It appears as it enters the screen, unless
+ * it is inside a block that already does (`reveals={false}`).
+ */
+function Shot({
+  src,
+  alt,
+  width,
+  height,
+  className,
+  reveals = true,
+}: {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  className?: string;
+  reveals?: boolean;
+}) {
   return (
-    <div className={className ? `${styles.shot} ${className}` : styles.shot}>
+    <div className={className ? `${styles.shot} ${className}` : styles.shot} data-reveal={reveals ? "" : undefined}>
       <Image src={src} alt={alt} width={width} height={height} sizes="(max-width: 860px) 100vw, 620px" />
     </div>
   );
@@ -61,7 +85,8 @@ const FEATURES = [
 
 export default function LandingPage() {
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-reveal-root="">
+      <RevealOnScroll />
       <header className={styles.header}>
         <div className={styles.headerInner}>
           <Link href="/" className={styles.brand} aria-label="WorkBoard, inicio">
@@ -89,14 +114,14 @@ export default function LandingPage() {
         <div className={styles.after} />
 
         <section id="funcionalidades" className={styles.section} aria-labelledby="features-title">
-          <h2 id="features-title" className={styles.sectionTitle}>
+          <h2 id="features-title" className={styles.sectionTitle} data-reveal="">
             Todo el trabajo en un sitio, de «Por hacer» a «Hecho».
           </h2>
           <div className={styles.features}>
             {FEATURES.map((feature, index) => (
               <div key={feature.title} className={index % 2 === 1 ? `${styles.feature} ${styles.featureFlip}` : styles.feature}>
                 <Shot src={feature.shot.src} alt={feature.shot.alt} width={2560} height={"height" in feature.shot && feature.shot.height ? feature.shot.height : 1440} />
-                <div className={styles.featureText}>
+                <div className={styles.featureText} data-reveal="" style={revealDelay(150)}>
                   <h3 className={styles.featureTitle}>{feature.title}</h3>
                   <p className={styles.featureBody}>{feature.body}</p>
                   {feature.swatches && (
@@ -113,28 +138,29 @@ export default function LandingPage() {
         </section>
 
         <section id="mac-y-web" className={styles.section} aria-labelledby="platforms-title">
-          <h2 id="platforms-title" className={styles.sectionTitle}>
+          <h2 id="platforms-title" className={styles.sectionTitle} data-reveal="">
             La misma cuenta en tu Mac y en el navegador.
           </h2>
-          <p className={styles.sectionLead}>
+          <p className={styles.sectionLead} data-reveal="" style={revealDelay(100)}>
             Tus tableros se guardan en la nube. Ábrelos desde la app de Mac o desde la web en cualquier ordenador.
           </p>
           <div className={styles.pair}>
-            <div className={styles.pairItem}>
+            <div className={styles.pairItem} data-reveal="">
               <Shot
                 src="/landing/mac.png"
                 alt="La app WorkBoard en el escritorio del Mac, con un tablero de listas y tareas de colores"
                 width={2000}
                 height={1261}
                 className={styles.pairShot}
+                reveals={false}
               />
               <h3 className={styles.pairTitle}>En el Mac</h3>
               <p className={styles.featureBody}>
                 Una app nativa con barra de menús, atajos de teclado y menú contextual con clic derecho, como el resto de tus apps.
               </p>
             </div>
-            <div className={styles.pairItem}>
-              <Shot src="/landing/web.png" alt="WorkBoard en el navegador" width={2560} height={1440} className={styles.pairShot} />
+            <div className={styles.pairItem} data-reveal="" style={revealDelay(150)}>
+              <Shot src="/landing/web.png" alt="WorkBoard en el navegador" width={2560} height={1440} className={styles.pairShot} reveals={false} />
               <h3 className={styles.pairTitle}>En la web</h3>
               <p className={styles.featureBody}>
                 Sin instalar nada: entra con tu correo o tu nickname y sigue donde lo dejaste. Tus últimas cuentas se abren sin volver a escribir la contraseña.
@@ -144,7 +170,7 @@ export default function LandingPage() {
         </section>
 
         <section className={styles.section} aria-labelledby="cta-title">
-          <div className={styles.closing}>
+          <div className={styles.closing} data-reveal="">
             <LogoSymbol className={styles.closingSymbol} />
             <h2 id="cta-title" className={styles.sectionTitle}>
               Crea tu primer tablero.
