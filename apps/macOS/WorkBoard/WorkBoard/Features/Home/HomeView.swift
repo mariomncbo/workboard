@@ -140,7 +140,7 @@ struct HomeView: View {
         let summary = model.summary(for: board)
         let message: LocalizedStringKey = summary.listCount == 0
             ? "Se borrará el tablero. Esta acción no se puede deshacer."
-            : "Se borrarán el tablero, sus ^[\(summary.listCount) lista](inflect: true) y sus ^[\(summary.taskCount) tarea](inflect: true). Esta acción no se puede deshacer."
+            : "Se borrarán el tablero, \(CountText.theirLists(summary.listCount)) y \(CountText.theirTasks(summary.taskCount)). Esta acción no se puede deshacer."
 
         deletion = DeletionRequest(
             title: "¿Eliminar «\(board.name)»?",

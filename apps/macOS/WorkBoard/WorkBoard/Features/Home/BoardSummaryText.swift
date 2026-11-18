@@ -8,7 +8,7 @@ struct BoardSummaryText: View {
         if summary.listCount == 0 {
             Text("Sin listas")
         } else {
-            Text("^[\(summary.listCount) lista](inflect: true) · ^[\(summary.taskCount) tarea](inflect: true)")
+            Text(verbatim: "\(CountText.lists(summary.listCount)) · \(CountText.tasks(summary.taskCount))")
         }
     }
 }

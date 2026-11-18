@@ -26,10 +26,10 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image" },
 };
 
-/** A real screenshot of the app (or a placeholder until it exists), with its frame. */
-function Shot({ src, alt, width, height }: { src: string; alt: string; width: number; height: number }) {
+/** A real screenshot of the app, with its frame. */
+function Shot({ src, alt, width, height, className }: { src: string; alt: string; width: number; height: number; className?: string }) {
   return (
-    <div className={styles.shot}>
+    <div className={className ? `${styles.shot} ${className}` : styles.shot}>
       <Image src={src} alt={alt} width={width} height={height} sizes="(max-width: 860px) 100vw, 620px" />
     </div>
   );
@@ -121,14 +121,20 @@ export default function LandingPage() {
           </p>
           <div className={styles.pair}>
             <div className={styles.pairItem}>
-              <Shot src="/landing/mac.png" alt="WorkBoard en el Mac, con la barra de herramientas de vidrio" width={2560} height={1440} />
+              <Shot
+                src="/landing/mac.png"
+                alt="La app WorkBoard en el escritorio del Mac, con un tablero de listas y tareas de colores"
+                width={2000}
+                height={1261}
+                className={styles.pairShot}
+              />
               <h3 className={styles.pairTitle}>En el Mac</h3>
               <p className={styles.featureBody}>
                 Una app nativa con barra de menús, atajos de teclado y menú contextual con clic derecho, como el resto de tus apps.
               </p>
             </div>
             <div className={styles.pairItem}>
-              <Shot src="/landing/web.png" alt="WorkBoard en el navegador" width={2560} height={1440} />
+              <Shot src="/landing/web.png" alt="WorkBoard en el navegador" width={2560} height={1440} className={styles.pairShot} />
               <h3 className={styles.pairTitle}>En la web</h3>
               <p className={styles.featureBody}>
                 Sin instalar nada: entra con tu correo o tu nickname y sigue donde lo dejaste. Tus últimas cuentas se abren sin volver a escribir la contraseña.

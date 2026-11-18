@@ -34,7 +34,7 @@ struct BoardListDragPreview: View {
             }
 
             if tasks.count > Self.maximumVisibleTasks {
-                Text("y ^[\(tasks.count - Self.maximumVisibleTasks) tarea](inflect: true) más")
+                Text(verbatim: "y \(CountText.tasks(tasks.count - Self.maximumVisibleTasks)) más")
                     .font(.subheadline)
                     .foregroundStyle(list.style.secondaryText)
                     .padding(.horizontal, 6)

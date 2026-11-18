@@ -49,7 +49,7 @@ struct BoardListHeader: View {
             Text(list.taskCount, format: .number)
                 .font(.taskCount)
                 .foregroundStyle(list.style.secondaryText)
-                .accessibilityLabel(Text("^[\(list.taskCount) tarea](inflect: true)"))
+                .accessibilityLabel(Text(verbatim: CountText.tasks(list.taskCount)))
 
             Menu {
                 ListActions(style: list.style, onRename: startRenaming, onSetStyle: onSetStyle, onDelete: onDelete)

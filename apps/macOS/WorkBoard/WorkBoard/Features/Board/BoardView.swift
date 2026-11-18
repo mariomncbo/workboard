@@ -206,7 +206,7 @@ struct BoardView: View {
     private func confirmDeletion(of list: BoardList) {
         let message: LocalizedStringKey = list.taskCount == 0
             ? "Se borrará la lista. Esta acción no se puede deshacer."
-            : "Se borrarán la lista y sus ^[\(list.taskCount) tarea](inflect: true). Esta acción no se puede deshacer."
+            : "Se borrarán la lista y \(CountText.theirTasks(list.taskCount)). Esta acción no se puede deshacer."
 
         deletion = DeletionRequest(
             title: "¿Eliminar la lista «\(list.name)»?",
@@ -232,7 +232,7 @@ struct BoardView: View {
         let summary = model.summary
         let message: LocalizedStringKey = summary.listCount == 0
             ? "Se borrará el tablero. Esta acción no se puede deshacer."
-            : "Se borrarán el tablero, sus ^[\(summary.listCount) lista](inflect: true) y sus ^[\(summary.taskCount) tarea](inflect: true). Esta acción no se puede deshacer."
+            : "Se borrarán el tablero, \(CountText.theirLists(summary.listCount)) y \(CountText.theirTasks(summary.taskCount)). Esta acción no se puede deshacer."
 
         deletion = DeletionRequest(
             title: "¿Eliminar «\(model.board.name)»?",

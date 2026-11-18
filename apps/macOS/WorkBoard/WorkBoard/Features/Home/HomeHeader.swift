@@ -12,7 +12,7 @@ struct HomeHeader: View {
                 .accessibilityAddTraits(.isHeader)
             Spacer()
             if boardCount > 0 {
-                Text("^[\(boardCount) tablero](inflect: true) · favoritos primero")
+                Text(verbatim: "\(CountText.boards(boardCount)) · favoritos primero")
                     .font(.callout)
                     .foregroundStyle(Color.textSecondary)
             }
