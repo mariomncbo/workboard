@@ -58,12 +58,9 @@ struct UserMenu: View {
             UserMenuRow("Apoyar en GitHub ⭐️") {
                 run { openURL(AppLinks.repository) }
             }
-            UserMenuRow("Visitar la web", detail: AppLinks.website == nil ? Text("Próximamente") : nil) {
-                if let website = AppLinks.website {
-                    run { openURL(website) }
-                }
+            UserMenuRow("Visitar la web") {
+                run { openURL(AppLinks.website) }
             }
-            .disabled(AppLinks.website == nil)
 
             menuDivider
 
